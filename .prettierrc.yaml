@@ -1,0 +1,6 @@
+# singleQuote: false
+quoteProps: 'consistent'
+trailingComma: 'none'
+# bracketSpacing: true
+# jsxSingleQuote: false
+printWidth: 100

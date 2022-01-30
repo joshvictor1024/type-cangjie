@@ -1,0 +1,8 @@
+.Input {
+  position: absolute;
+  top: 20px;
+  width: 100px;
+  height: 28px;
+  border: 1px solid black;
+  padding: 2px;
+}

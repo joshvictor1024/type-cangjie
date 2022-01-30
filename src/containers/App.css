@@ -1,0 +1,19 @@
+.App {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.Header {
+  flex: 0 0 10vh;
+}
+.Typing {
+  flex: 0 0 10vh;
+  outline: none; /*disable border when focused*/
+}
+.Dashboard {
+  flex: 1 1 70vh;
+}
+.Footer {
+  flex: 0 0 10vh;
+}
