@@ -6,7 +6,7 @@ import useCharacterHistory from "./useCharacterHistory";
 const WORD_QUEUE_MIN_WORDS = 5;
 const WORD_QUEUE_MAX_WORDS = 10;
 
-export default function usePractice({ wordbanks, currentWordbankName }) {
+export default function usePractice({ wordbanks, activeWordbanks }) {
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
   function newCurrentWordProgress() {
@@ -34,11 +34,13 @@ export default function usePractice({ wordbanks, currentWordbankName }) {
         console.log("correct");
         setCode(codeInput);
         endCharacter();
-        setCodeInput("");
         if (checkWordDone()) {
-          beginCharacter(wordQueue[1][0]);
+          if (wordQueue.length >= 2) {
+            beginCharacter(wordQueue[1][0]);
+          }
           setWordQueue(wordQueue.slice(1));
           setCurrentWordProgress(newCurrentWordProgress());
+          setCodeInput("");
         } else {
           beginCharacter(wordQueue[0][currentWordProgress.correctCharacterCount + 1]);
           setCurrentWordProgress((c) => {
@@ -47,6 +49,7 @@ export default function usePractice({ wordbanks, currentWordbankName }) {
               correctCharacterCount: c.correctCharacterCount + 1
             };
           });
+          setCodeInput("");
         }
       } else {
         console.log("wrong");
@@ -90,31 +93,51 @@ export default function usePractice({ wordbanks, currentWordbankName }) {
   const { handleKeydown } = useKeyboardEvent(onKeyDown);
 
   function drawRandom(count) {
-    const cwb = wordbanks[currentWordbankName];
-    if (!cwb) return null;
+    console.log("draw");
+    const awb = activeWordbanks.map((wordbankName) => wordbanks[wordbankName]).filter((wb) => wb);
+    //console.log(awb);
+    if (awb.length === 0) return null;
+
+    const cumulativeLengths = [0]; // from [0]:0 to [aws.length]:sum
+    for (let i = 0; i < awb.length; i++) {
+      cumulativeLengths[i + 1] = cumulativeLengths[i] + awb[i].words.length;
+    }
+
     const result = [];
     for (let i = 0; i < count; i++) {
-      result.push(cwb.words[Math.floor(Math.random() * cwb.words.length)]);
+      const r = Math.floor(Math.random() * cumulativeLengths[cumulativeLengths.length - 1]);
+      for (let j = 0; j < activeWordbanks.length; j++) {
+        if (r < cumulativeLengths[j + 1]) {
+          result.push(awb[j].words[r - cumulativeLengths[j]]);
+          break;
+        }
+      }
     }
+    //console.log(result);
     return result;
   }
   useEffect(() => {
-    if (!wordbanks[currentWordbankName]) return;
-    if (wordQueue.length === 0) {
-      const words = drawRandom(WORD_QUEUE_MAX_WORDS);
-      beginCharacter(words[0]);
-      setWordQueue(words);
-      setCurrentWordProgress(newCurrentWordProgress());
-    } else if (wordQueue.length < WORD_QUEUE_MIN_WORDS) {
-      const words = drawRandom(WORD_QUEUE_MAX_WORDS - wordQueue.length);
-      setWordQueue((c) => {
+    if (activeWordbanks.length === 0) return;
+    const words = drawRandom(WORD_QUEUE_MAX_WORDS);
+    if (words === null) return;
+    beginCharacter(words[0]);
+    //console.log(words);
+    setWordQueue(words);
+    setCurrentWordProgress(newCurrentWordProgress());
+    setCodeInput("");
+  }, [wordbanks, activeWordbanks]);
+  useEffect(() => {
+    if (activeWordbanks.length === 0) return;
+    setWordQueue((c) => {
+      if (c.length < WORD_QUEUE_MIN_WORDS) {
+        const words = drawRandom(WORD_QUEUE_MAX_WORDS - c.length);
+        if (words === null) return c;
+        //console.log(c, words);
         return [...c, ...words];
-      });
-    }
-  }, [wordQueue, wordbanks, currentWordbankName]);
+      }
+      return c;
+    });
+  }, [wordQueue]);
 
-  function refreshLivewords() {
-    setWordQueue([]);
-  }
-  return { handleKeydown, wordQueue, currentWordProgress, refreshLivewords, codeInput };
+  return { handleKeydown, wordQueue, currentWordProgress, codeInput };
 }

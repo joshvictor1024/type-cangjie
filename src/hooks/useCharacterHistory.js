@@ -27,9 +27,9 @@ export default function useCharacterHistory() {
 
   useEffect(() => {
     if (isAvailable()) {
-      const localWordKeyHistory = getHistory();
-      if (localWordKeyHistory) {
-        historyRef.current = localWordKeyHistory;
+      const localHistory = getHistory();
+      if (localHistory) {
+        historyRef.current = localHistory;
       }
     }
   }, []);

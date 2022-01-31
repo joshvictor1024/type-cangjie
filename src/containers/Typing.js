@@ -7,14 +7,16 @@ export default function Typing({ wordQueue, currentWordProgress, codeInput }) {
     <div>
       Typing
       <div className="WordQueue">
-        {wordQueue.map((word, i) => (
-          <Word
-            key={i}
-            word={word}
-            progress={i === 0 ? currentWordProgress : null}
-            code={i === 0 ? codeInput : null}
-          />
-        ))}
+        {wordQueue.length > 0
+          ? wordQueue.map((word, i) => (
+              <Word
+                key={i}
+                word={word}
+                progress={i === 0 ? currentWordProgress : null}
+                code={i === 0 ? codeInput : null}
+              />
+            ))
+          : "選擇任一字庫以繼續..."}
       </div>
     </div>
   );

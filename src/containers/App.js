@@ -1,27 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import "./App.css";
 import Typing from "./Typing";
 import Dashboard from "./Dashboard";
 import useWordbank from "../hooks/useWordbank";
 import usePractice from "../hooks/usePractice";
-
-const DEFAULT_WORDBANK = "common-character-l1";
+import useSettings from "../hooks/useSettings";
 
 function App() {
-  const [currentWordbankName, setCurrentWordbankName] = useState(null);
   const { wordbanks } = useWordbank();
-  const { handleKeydown, wordQueue, currentWordProgress, refreshLivewords, codeInput } =
-    usePractice({
-      wordbanks: wordbanks,
-      currentWordbankName: currentWordbankName
-    });
-
-  useEffect(() => {
-    if (currentWordbankName === null && wordbanks[DEFAULT_WORDBANK]) {
-      setCurrentWordbankName(DEFAULT_WORDBANK);
-      refreshLivewords();
-    }
-  }, [currentWordbankName, wordbanks]);
+  const { settings, setSetting } = useSettings();
+  const { handleKeydown, wordQueue, currentWordProgress, codeInput } = usePractice({
+    wordbanks: wordbanks,
+    activeWordbanks: settings.activeWordbanks
+  });
 
   return (
     <div className="App">
@@ -34,7 +25,7 @@ function App() {
         />
       </div>
       <div className="Dashboard">
-        <Dashboard wordbanks={wordbanks} />
+        <Dashboard wordbanks={wordbanks} settings={settings} setSetting={setSetting} />
       </div>
       <div className="Footer">footer</div>
     </div>
