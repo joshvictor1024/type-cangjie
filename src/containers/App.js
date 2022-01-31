@@ -10,10 +10,11 @@ const DEFAULT_WORDBANK = "common-character-l1";
 function App() {
   const [currentWordbankName, setCurrentWordbankName] = useState(null);
   const { wordbanks } = useWordbank();
-  const { handleKeydown, livewordQueue, refreshLivewords, inputCode } = usePractice({
-    wordbanks: wordbanks,
-    currentWordbankName: currentWordbankName
-  });
+  const { handleKeydown, wordQueue, currentWordProgress, refreshLivewords, codeInput } =
+    usePractice({
+      wordbanks: wordbanks,
+      currentWordbankName: currentWordbankName
+    });
 
   useEffect(() => {
     if (currentWordbankName === null && wordbanks[DEFAULT_WORDBANK]) {
@@ -26,7 +27,11 @@ function App() {
     <div className="App">
       <div className="Header">header</div>
       <div className="Typing" tabIndex={0} onKeyDown={handleKeydown}>
-        <Typing livewordQueue={livewordQueue} inputCode={inputCode} />
+        <Typing
+          wordQueue={wordQueue}
+          currentWordProgress={currentWordProgress}
+          codeInput={codeInput}
+        />
       </div>
       <div className="Dashboard">
         <Dashboard wordbanks={wordbanks} />

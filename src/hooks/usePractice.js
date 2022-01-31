@@ -1,26 +1,72 @@
 import { useState, useEffect, useRef } from "react";
 import useCangjieCode from "./useCangjieCode";
 import useKeyboardEvent from "./useKeyboardEvent";
+import useCharacterHistory from "./useCharacterHistory";
+
+const WORD_QUEUE_MIN_WORDS = 5;
+const WORD_QUEUE_MAX_WORDS = 10;
 
 export default function usePractice({ wordbanks, currentWordbankName }) {
-  const [livewordQueue, setLivewordQueue] = useState([]);
-  const [inputCode, setInputCode] = useState("");
-  const isLastInputWrongRef = useRef(false);
+  const [wordQueue, setWordQueue] = useState([]);
+  const [currentWordProgress, setCurrentWordProgress] = useState(null);
+  function newCurrentWordProgress() {
+    return {
+      hasWrongCharacter: false,
+      correctCharacterCount: 0
+    };
+  }
+  const [codeInput, setCodeInput] = useState("");
+  const shouldClearInputFirstRef = useRef(false);
 
   const { toCode } = useCangjieCode();
+  const { addKey, setError, setCode, beginCharacter, endCharacter } = useCharacterHistory();
 
   function onKeyDown(key, t) {
+    addKey(key, t);
     if (key === "Backspace") {
-      setInputCode((c) => c.slice(0, -1));
+      setCodeInput((c) => c.slice(0, -1));
     } else if (key === "Space") {
-      checkCharacter();
-    } else {
-      if (isLastInputWrongRef.current) {
-        isLastInputWrongRef.current = false;
-        setInputCode(key);
+      const characterCorrect = checkCharacterCorrect();
+      if (characterCorrect === null) {
         return;
       }
-      setInputCode((c) => {
+      if (characterCorrect) {
+        console.log("correct");
+        setCode(codeInput);
+        endCharacter();
+        setCodeInput("");
+        if (checkWordDone()) {
+          beginCharacter(wordQueue[1][0]);
+          setWordQueue(wordQueue.slice(1));
+          setCurrentWordProgress(newCurrentWordProgress());
+        } else {
+          beginCharacter(wordQueue[0][currentWordProgress.correctCharacterCount + 1]);
+          setCurrentWordProgress((c) => {
+            return {
+              hasWrongCharacter: false,
+              correctCharacterCount: c.correctCharacterCount + 1
+            };
+          });
+        }
+      } else {
+        console.log("wrong");
+        setError();
+        shouldClearInputFirstRef.current = true;
+        setCurrentWordProgress((c) => {
+          return {
+            hasWrongCharacter: true,
+            correctCharacterCount: c.correctCharacterCount
+          };
+        });
+      }
+    } else {
+      // letter keys
+      if (shouldClearInputFirstRef.current) {
+        shouldClearInputFirstRef.current = false;
+        setCodeInput(key);
+        return;
+      }
+      setCodeInput((c) => {
         if (c.length < 5) {
           return c + key;
         }
@@ -28,52 +74,47 @@ export default function usePractice({ wordbanks, currentWordbankName }) {
       });
     }
   }
-  function checkCharacter() {
-    if (livewordQueue.length === 0) return;
-    const lw = livewordQueue[0];
-    const ch = lw.characters[lw.correctCharacterCount];
-    const codes = toCode(ch);
 
-    const nextLivewordQueue = [...livewordQueue];
-    if (codes.includes(inputCode)) {
-      console.log("correct");
-      nextLivewordQueue[0].hasWrongCharacter = false;
-      nextLivewordQueue[0].correctCharacterCount++;
-      setLivewordQueue(nextLivewordQueue);
-      checkLiveword(nextLivewordQueue);
-    } else {
-      console.log("wrong");
-      isLastInputWrongRef.current = true;
-      nextLivewordQueue[0].hasWrongCharacter = true;
-      setLivewordQueue(nextLivewordQueue);
-    }
+  function checkCharacterCorrect() {
+    if (wordQueue.length === 0) return null;
+
+    const ch = wordQueue[0][currentWordProgress.correctCharacterCount];
+    const codes = toCode(ch);
+    return codes.includes(codeInput);
   }
-  function checkLiveword(nextLivewordQueue) {
-    const lw = nextLivewordQueue[0];
-    if (lw.correctCharacterCount === lw.characters.length && lw.hasWrongCharacter === false) {
-      setLivewordQueue(nextLivewordQueue.slice(1));
-      setInputCode("");
-    }
+  function checkWordDone() {
+    const w = wordQueue[0];
+    return currentWordProgress.correctCharacterCount + 1 === w.length;
   }
+
   const { handleKeydown } = useKeyboardEvent(onKeyDown);
 
-  useEffect(() => {
+  function drawRandom(count) {
     const cwb = wordbanks[currentWordbankName];
-    if (livewordQueue.length < 5 && cwb) {
-      const livewords = [];
-      for (let i = 0; i < 5; i++) {
-        livewords.push({
-          characters: cwb.words[Math.floor(Math.random() * cwb.words.length)],
-          correctCharacterCount: 0,
-          hasWrongCharacter: false
-        });
-      }
-      setLivewordQueue((c) => [...c, ...livewords]);
+    if (!cwb) return null;
+    const result = [];
+    for (let i = 0; i < count; i++) {
+      result.push(cwb.words[Math.floor(Math.random() * cwb.words.length)]);
     }
-  }, [livewordQueue, wordbanks, currentWordbankName]);
+    return result;
+  }
+  useEffect(() => {
+    if (!wordbanks[currentWordbankName]) return;
+    if (wordQueue.length === 0) {
+      const words = drawRandom(WORD_QUEUE_MAX_WORDS);
+      beginCharacter(words[0]);
+      setWordQueue(words);
+      setCurrentWordProgress(newCurrentWordProgress());
+    } else if (wordQueue.length < WORD_QUEUE_MIN_WORDS) {
+      const words = drawRandom(WORD_QUEUE_MAX_WORDS - wordQueue.length);
+      setWordQueue((c) => {
+        return [...c, ...words];
+      });
+    }
+  }, [wordQueue, wordbanks, currentWordbankName]);
 
   function refreshLivewords() {
-    setLivewordQueue([]);
+    setWordQueue([]);
   }
-  return { handleKeydown, livewordQueue, refreshLivewords, inputCode };
+  return { handleKeydown, wordQueue, currentWordProgress, refreshLivewords, codeInput };
 }

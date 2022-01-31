@@ -1,23 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import "./Typing.css";
-import Liveword from "./Liveword";
-import Input from "./Input";
+import Word from "./Word";
 
-export default function Typing({ livewordQueue, inputCode }) {
-  //const [currentLiveword, setCurrentLiveword] = useState(null);
-  //const [currentLiveword, setCurrentLiveword] = useState(0);
-  function attachInput(i) {
-    if (i === 0) {
-      return <Input code={inputCode} />;
-    }
-    return null;
-  }
+export default function Typing({ wordQueue, currentWordProgress, codeInput }) {
   return (
     <div>
       Typing
-      <div className="LivewordQueue">
-        {livewordQueue.map((liveword, i) => (
-          <Liveword key={i} id={i} liveword={liveword} input={attachInput(i)} />
+      <div className="WordQueue">
+        {wordQueue.map((word, i) => (
+          <Word
+            key={i}
+            word={word}
+            progress={i === 0 ? currentWordProgress : null}
+            code={i === 0 ? codeInput : null}
+          />
         ))}
       </div>
     </div>
