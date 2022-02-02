@@ -36,21 +36,27 @@ function toRadicals(code) {
     .join("");
 }
 
-export default function Lookup({ toCode }) {
+export default function Lookup({ character, setCharacter, toCode }) {
   toCode = toCode ?? (() => []);
 
-  const char = "佑";
-  const cj3Codes = toCode(char, "3");
-  const cj5Codes = toCode(char, "5");
-  const cj5xCodes = toCode(char, "5x");
-  const cjmsCodes = toCode(char, "ms");
+  const cj3Codes = toCode(character, "3");
+  const cj5Codes = toCode(character, "5");
+  const cj5xCodes = toCode(character, "5x");
+  const cjmsCodes = toCode(character, "ms");
   const cj3Code = cj3Codes[0] ? cj3Codes[0] : "";
   const cj5Code = cj5Codes[0] ? cj5Codes[0] : "";
   const cj5xCode = cj5xCodes[0] ? cj5xCodes[0] : "";
   const cjmsCode = cjmsCodes[0] ? cjmsCodes[0] : "";
   return (
     <div className="Lookup">
-      <div className="Lookup__character">{char}</div>
+      <input
+        className="Lookup__input"
+        type="text"
+        value={character}
+        onChange={(e) => setCharacter(e.target.value)}
+        maxLength={1}
+        title="點擊輸入文字，以查詢倉頡編碼"
+      />
       <div className="Lookup__result">
         <table>
           <tbody>

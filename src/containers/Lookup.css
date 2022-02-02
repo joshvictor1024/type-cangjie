@@ -2,8 +2,17 @@
   display: flex;
   align-items: center;
 }
-.Lookup__character {
+.Lookup__input {
   font-size: 5rem;
+  box-sizing: content-box;
+  width: 5rem;
+  border: none;
+  outline: none;
+  background-color: #f3f3f3;
+  cursor: pointer;
+}
+.Lookup__input:focus {
+  cursor: text;
 }
 .Lookup__result {
   height: 6rem;

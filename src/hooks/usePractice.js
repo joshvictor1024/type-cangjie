@@ -6,7 +6,7 @@ import useDebounceDependency from "./useDebounceDependency";
 const WORD_QUEUE_MIN_WORDS = 5;
 const WORD_QUEUE_MAX_WORDS = 10;
 
-export default function usePractice({ wordbanks, activeWordbanks, toCode }) {
+export default function usePractice({ wordbanks, activeWordbanks, toCode, setLookupCharacter }) {
   const debouncedWordbanks = useDebounceDependency(wordbanks, undefined, 100, { falling: true });
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
@@ -61,6 +61,7 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode }) {
             correctCharacterCount: c.correctCharacterCount
           };
         });
+        setLookupCharacter(wordQueue[0][currentWordProgress.correctCharacterCount]);
       }
     } else {
       // letter keys

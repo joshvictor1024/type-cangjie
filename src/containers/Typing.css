@@ -6,12 +6,15 @@
   display: flex;
   width: 20rem;
 }
-.Word--ready {
+.Character {
+  cursor: pointer;
+}
+.Character--ready {
   color: black;
 }
-.Word--correct {
+.Character--correct {
   color: gray;
 }
-.Word--wrong {
+.Character--wrong {
   color: red;
 }

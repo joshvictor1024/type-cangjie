@@ -3,7 +3,7 @@ import "./Typing.css";
 import Word from "./Word";
 import Input from "./Input";
 
-export default function Typing({ wordQueue, currentWordProgress, codeInput, handleKeydown }) {
+export default function Typing({ wordQueue, currentWordProgress, codeInput, handleKeydown, setLookupCharacter }) {
   return (
     <div className="Typing" tabIndex={0} onKeyDown={handleKeydown}>
       <div className="WordQueue">
@@ -13,6 +13,7 @@ export default function Typing({ wordQueue, currentWordProgress, codeInput, hand
                 key={i}
                 word={word}
                 progress={i === 0 ? currentWordProgress : null}
+                setLookupCharacter={setLookupCharacter}
               />
             ))
           : "選擇任一字庫以繼續..."}

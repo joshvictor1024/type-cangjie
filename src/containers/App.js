@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./App.css";
 import Typing from "./Typing";
 import Dashboard from "./Dashboard/Dashboard";
@@ -9,23 +9,26 @@ import useSettings from "../hooks/useSettings";
 import Lookup from "./Lookup";
 
 function App() {
+  const [lookupCharacter, setLookupCharacter] = useState("");
   const { wordbanks } = useWordbank();
   const { settings, setSetting } = useSettings();
   const { toCode } = useCangjieCode();
   const { handleKeydown, wordQueue, currentWordProgress, codeInput } = usePractice({
     wordbanks: wordbanks,
     activeWordbanks: settings.activeWordbanks,
-    toCode: toCode
+    toCode: toCode,
+    setLookupCharacter: setLookupCharacter
   });
 
   return (
     <div className="App">
-      <Lookup toCode={toCode} />
+      <Lookup toCode={toCode} character={lookupCharacter} setCharacter={setLookupCharacter} />
       <Typing
         wordQueue={wordQueue}
         currentWordProgress={currentWordProgress}
         codeInput={codeInput}
         handleKeydown={handleKeydown}
+        setLookupCharacter={setLookupCharacter}
       />
       <Dashboard wordbanks={wordbanks} settings={settings} setSetting={setSetting} />
       <div className="Footer">
