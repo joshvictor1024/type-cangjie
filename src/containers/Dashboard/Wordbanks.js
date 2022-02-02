@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Wordbanks.css";
+import useDebounceDependency from "../../hooks/useDebounceDependency";
 
 function doPropertiesMatch(obj1, obj2) {
   const keys1 = Object.keys(obj1);
@@ -15,14 +16,14 @@ function doPropertiesMatch(obj1, obj2) {
 }
 
 export default function Wordbanks({ wordbanks, settings, setSetting }) {
+  const debouncedWordbanks = useDebounceDependency(wordbanks, undefined, 100, {falling: true});
   const [renderedWordbanks, setRenderedWordbanks] = useState({});
 
   useEffect(() => {
     if (!doPropertiesMatch(renderedWordbanks, wordbanks)) {
       setRenderedWordbanks(wordbanks);
     }
-  }, [wordbanks]);
-  useEffect(() => {}, [wordbanks]);
+  }, [debouncedWordbanks]);
 
   function changeActiveWordbank(wordbankName, checked) {
     const activeWordbanks = [...settings.activeWordbanks];

@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import useKeyboardEvent from "./useKeyboardEvent";
 import useCharacterHistory from "./useCharacterHistory";
+import useDebounceDependency from "./useDebounceDependency";
 
 const WORD_QUEUE_MIN_WORDS = 5;
 const WORD_QUEUE_MAX_WORDS = 10;
 
 export default function usePractice({ wordbanks, activeWordbanks, toCode }) {
+  const debouncedWordbanks = useDebounceDependency(wordbanks, undefined, 100, { falling: true });
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
   function newCurrentWordProgress() {
@@ -123,7 +125,7 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode }) {
     setWordQueue(words);
     setCurrentWordProgress(newCurrentWordProgress());
     setCodeInput("");
-  }, [wordbanks, activeWordbanks]);
+  }, [debouncedWordbanks, activeWordbanks]);
   useEffect(() => {
     if (activeWordbanks.length === 0) return;
     setWordQueue((c) => {
