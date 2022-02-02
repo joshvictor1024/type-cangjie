@@ -1,12 +1,17 @@
+.Typing {
+  outline: none; /*disable border when focused*/
+  font-size: 2rem;
+}
 .WordQueue {
   display: flex;
+  width: 20rem;
 }
-.ready {
+.Word--ready {
   color: black;
 }
-.correct {
+.Word--correct {
   color: gray;
 }
-.wrong {
+.Word--wrong {
   color: red;
 }

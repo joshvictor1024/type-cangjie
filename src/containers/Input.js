@@ -37,5 +37,5 @@ function toRadicals(code) {
 }
 
 export default function Input({ code }) {
-  return <div className="Input">{toRadicals(code)}</div>;
+  return <div className="Input">{code ? toRadicals(code) : "　"}</div>;
 }

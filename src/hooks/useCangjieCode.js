@@ -2,29 +2,30 @@ import { useState, useEffect, useRef } from "react";
 
 const VERSION_3 = "3";
 const VERSION_5 = "5";
+const VERSION_5x = "5x";
 const VERSION_3_AND_5 = "3n5";
 const VERSION_MS = "ms";
 const VERSION_MS_AND_3 = "msn3";
 
 export default function useCangjieCode() {
-  const [version, setVersion] = useState(VERSION_3_AND_5);
+  const [loaded, setLoaded] = useState(false);
   const cj3 = useRef(null);
   const cj5 = useRef(null);
   const cj5x = useRef(null);
   const cjms = useRef(null);
-
-  async function loadDictionary(dictionaryName) {
-    try {
-      const res = await fetch(`cangjie/dictionary/${dictionaryName}.json`);
-      const json = await res.json();
-      return json;
-    } catch (e) {
-      console.error(e);
-    }
-    return null;
-  }
+  
   useEffect(() => {
     (async () => {
+      async function loadDictionary(dictionaryName) {
+        try {
+          const res = await fetch(`cangjie/dictionary/${dictionaryName}.json`);
+          const json = await res.json();
+          return json;
+        } catch (e) {
+          console.error(e);
+        }
+        return null;
+      }
       const cj3Dictonary = await loadDictionary("3");
       const cj5Dictonary = await loadDictionary("5");
       const cj5xDictonary = await loadDictionary("5x");
@@ -36,10 +37,12 @@ export default function useCangjieCode() {
       cj5.current = cj5Dictonary;
       cj5x.current = cj5xDictonary;
       cjms.current = cjmsDictonary;
+      setLoaded(true);
     })();
   }, []);
 
-  function toCode(character) {
+  function toCode(character, version = VERSION_3_AND_5) {
+    if (!loaded) return [];
     const cj3Codes = cj3.current[character];
     const cj5Codes = cj5.current[character];
     const cj5xCodes = cj5x.current[character];
@@ -52,6 +55,9 @@ export default function useCangjieCode() {
         return codes;
       case VERSION_5:
         if (cj5Codes) codes.push(...cj5Codes);
+        if (cj5xCodes) codes.push(...cj5xCodes);
+        return codes;
+      case VERSION_5x:
         if (cj5xCodes) codes.push(...cj5xCodes);
         return codes;
       case VERSION_3_AND_5:

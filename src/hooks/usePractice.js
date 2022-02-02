@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import useCangjieCode from "./useCangjieCode";
 import useKeyboardEvent from "./useKeyboardEvent";
 import useCharacterHistory from "./useCharacterHistory";
 
 const WORD_QUEUE_MIN_WORDS = 5;
 const WORD_QUEUE_MAX_WORDS = 10;
 
-export default function usePractice({ wordbanks, activeWordbanks }) {
+export default function usePractice({ wordbanks, activeWordbanks, toCode }) {
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
   function newCurrentWordProgress() {
@@ -18,7 +17,6 @@ export default function usePractice({ wordbanks, activeWordbanks }) {
   const [codeInput, setCodeInput] = useState("");
   const shouldClearInputFirstRef = useRef(false);
 
-  const { toCode } = useCangjieCode();
   const { addKey, setError, setCode, beginCharacter, endCharacter } = useCharacterHistory();
 
   function onKeyDown(key, t) {

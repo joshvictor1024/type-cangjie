@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import "./Wordbanks.css";
 
 function doPropertiesMatch(obj1, obj2) {
   const keys1 = Object.keys(obj1);
@@ -13,7 +14,7 @@ function doPropertiesMatch(obj1, obj2) {
   return true;
 }
 
-export default function Dashboard({ wordbanks, settings, setSetting }) {
+export default function Wordbanks({ wordbanks, settings, setSetting }) {
   const [renderedWordbanks, setRenderedWordbanks] = useState({});
 
   useEffect(() => {
@@ -40,17 +41,21 @@ export default function Dashboard({ wordbanks, settings, setSetting }) {
     }
   }
   return (
-    <div>
-      {Object.keys(wordbanks).map((wordbankName) => (
-        <div key={wordbankName}>
-          {wordbanks[wordbankName].display}
-          <input
-            type="checkbox"
-            checked={settings.activeWordbanks.includes(wordbankName)}
-            onChange={(e) => changeActiveWordbank(wordbankName, e.target.checked)}
-          />
-        </div>
-      ))}
+    <div className="Wordbanks">
+      <div className="column">
+        {Object.keys(renderedWordbanks).map((wordbankName) => (
+          <div className="Wordbanks__item" key={wordbankName}>
+            <label>
+              {renderedWordbanks[wordbankName].display}
+              <input
+                type="checkbox"
+                checked={settings.activeWordbanks.includes(wordbankName)}
+                onChange={(e) => changeActiveWordbank(wordbankName, e.target.checked)}
+              />
+            </label>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

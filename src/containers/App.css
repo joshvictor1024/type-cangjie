@@ -4,16 +4,28 @@
   display: flex;
   flex-direction: column;
 }
-.Header {
-  flex: 0 0 10vh;
+.Lookup {
+  margin: 4rem auto 1rem;
 }
 .Typing {
-  flex: 0 0 10vh;
-  outline: none; /*disable border when focused*/
+  margin: 0px auto 1rem;
 }
 .Dashboard {
-  flex: 1 1 70vh;
+  margin: 1rem auto 1rem;
+}
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.column {
+  display: flex;
+  flex-direction: column;
 }
 .Footer {
-  flex: 0 0 10vh;
+  margin: 1rem auto 0.2rem;
+}
+.Footer__github {
+  width: 20px;
+  height: 20px;
+  fill: #eeeeee;
 }

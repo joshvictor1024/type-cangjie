@@ -1,0 +1,24 @@
+.Dashboard {
+  flex: 1 1 auto;
+  height: 0px;
+  width: 500px;
+  border: 1px solid black;
+  display: flex;
+  flex-direction: column;
+}
+.Dashboard__tabs {
+  background-color: #f3f3f3;
+}
+.Dashboard__tab {
+  padding: 1rem 1rem 0.4rem;
+  cursor: pointer;
+  background-color: #f3f3f3;
+}
+.Dashboard__tab--active {
+  background-color: #ffffff;
+}
+.Dashboard__panel {
+  flex: 1 1 0px;
+  overflow-y: auto;
+  padding: 1rem 1rem 0.2rem;
+}

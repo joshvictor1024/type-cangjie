@@ -1,0 +1,26 @@
+.Lookup {
+  display: flex;
+  align-items: center;
+}
+.Lookup__character {
+  font-size: 5rem;
+}
+.Lookup__result {
+  height: 6rem;
+  display: flex;
+  justify-self: center;
+}
+/* 
+.Lookup__result tr {
+  border: 1px solid black;
+}
+*/
+.Lookup__result th {
+  padding: 0px 1rem;
+}
+.Lookup__result td {
+  width: 6rem;
+  padding-right: 1rem;
+  font-size: 1rem;
+  font-family: monospace;
+}
