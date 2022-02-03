@@ -1,10 +1,15 @@
 .Typing {
   outline: none; /*disable border when focused*/
   font-size: 2rem;
+  background-color: #f3f3f3;
+}
+.Typing:focus {
+  background-color: #ffffff;
 }
 .WordQueue {
   display: flex;
   width: 20rem;
+  overflow-x: hidden;
 }
 .Character {
   cursor: pointer;

@@ -13,6 +13,7 @@
 }
 .Lookup__input:focus {
   cursor: text;
+  background-color: #ffffff;
 }
 .Lookup__result {
   height: 6rem;
