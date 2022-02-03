@@ -5,6 +5,10 @@ import useCharacterHistory from "./useCharacterHistory";
 const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
 
+function getActiveWordbankList(activeWordbanks) {
+  return Object.keys(activeWordbanks).filter((wordbankName) => activeWordbanks[wordbankName]);
+}
+
 export default function usePractice({ wordbanks, activeWordbanks, toCode, setLookupCharacter }) {
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
@@ -94,7 +98,8 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
 
   function drawRandom(count) {
     console.log("draw");
-    const awb = activeWordbanks.map((wordbankName) => wordbanks[wordbankName]).filter((wb) => wb);
+    const awbl = getActiveWordbankList(activeWordbanks);
+    const awb = awbl.map((wordbankName) => wordbanks[wordbankName]).filter((wb) => wb);
     //console.log(awb);
     if (awb.length === 0) return null;
 
@@ -106,7 +111,7 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
     const result = [];
     for (let i = 0; i < count; i++) {
       const r = Math.floor(Math.random() * cumulativeLengths[cumulativeLengths.length - 1]);
-      for (let j = 0; j < activeWordbanks.length; j++) {
+      for (let j = 0; j < awbl.length; j++) {
         if (r < cumulativeLengths[j + 1]) {
           result.push(awb[j].words[r - cumulativeLengths[j]]);
           break;
@@ -117,7 +122,7 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
     return result;
   }
   useEffect(() => {
-    if (activeWordbanks.length === 0) return;
+    if (getActiveWordbankList(activeWordbanks).length === 0) return;
     const words = drawRandom(WORD_QUEUE_MAX_WORDS);
     if (words === null) return;
     beginCharacter(words[0]);
@@ -127,7 +132,7 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
     setCodeInput("");
   }, [wordbanks, activeWordbanks]);
   useEffect(() => {
-    if (activeWordbanks.length === 0) return;
+    if (getActiveWordbankList(activeWordbanks).length === 0) return;
     setWordQueue((c) => {
       if (c.length < WORD_QUEUE_MIN_WORDS) {
         const words = drawRandom(WORD_QUEUE_MAX_WORDS - c.length);

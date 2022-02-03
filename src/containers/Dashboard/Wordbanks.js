@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Wordbanks.css";
 import { useWordbanks } from "../../contexts/useWordbanks";
+import { useActiveWordbanks } from "../../contexts/useActiveWordbanks";
 
 function isObject(obj) {
   return (obj !== null && typeof obj === "object") || typeof obj === "function";
@@ -24,6 +25,7 @@ function doPropertiesMatch(obj1, obj2) {
 
 export default function Wordbanks({ settings, setSetting }) {
   const { wordbanks } = useWordbanks();
+  const { activeWordbanks, setActiveWordbank } = useActiveWordbanks();
   const [renderedWordbanks, setRenderedWordbanks] = useState({});
 
   useEffect(() => {
@@ -33,31 +35,20 @@ export default function Wordbanks({ settings, setSetting }) {
   }, [wordbanks]);
 
   function changeActiveWordbank(wordbankName, checked) {
-    const activeWordbanks = [...settings.activeWordbanks];
-    if (checked) {
-      if (!settings.activeWordbanks.includes(wordbankName)) {
-        activeWordbanks.push(wordbankName);
-        activeWordbanks.sort();
-        setSetting("activeWordbanks", activeWordbanks);
-      }
-    } else {
-      const i = settings.activeWordbanks.findIndex((wbn) => wbn === wordbankName);
-      if (i >= 0) {
-        activeWordbanks.splice(i, 1);
-        setSetting("activeWordbanks", activeWordbanks);
-      }
-    }
+    setActiveWordbank(wordbankName, checked);
+    return;
   }
   return (
     <div className="Wordbanks">
       <div className="column">
+        {/* TODO: item order */}
         {Object.keys(renderedWordbanks).map((wordbankName) => (
           <div className="Wordbanks__item" key={wordbankName}>
             <label>
               {renderedWordbanks[wordbankName].display}
               <input
                 type="checkbox"
-                checked={settings.activeWordbanks.includes(wordbankName)}
+                checked={activeWordbanks[wordbankName]}
                 onChange={(e) => changeActiveWordbank(wordbankName, e.target.checked)}
               />
             </label>

@@ -3,17 +3,19 @@ import "./App.css";
 import Typing from "./Typing";
 import Dashboard from "./Dashboard/Dashboard";
 import usePractice from "../hooks/usePractice";
-import useSettings from "../hooks/useSettings";
 import Lookup from "./Lookup";
 import { WordbanksProvider, useWordbanks } from "../contexts/useWordbanks";
+import { ActiveWordbanksProvider, useActiveWordbanks } from "../contexts/useActiveWordbanks";
 import { CangjieProvider, useCangjie } from "../contexts/useCangjie";
 
 function App() {
   return (
     <WordbanksProvider>
-      <CangjieProvider>
-        <AppWithContext />
-      </CangjieProvider>
+      <ActiveWordbanksProvider>
+        <CangjieProvider>
+          <AppWithContext />
+        </CangjieProvider>
+      </ActiveWordbanksProvider>
     </WordbanksProvider>
   );
 }
@@ -21,11 +23,11 @@ function App() {
 function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
   const { wordbanks } = useWordbanks();
-  const { settings, setSetting } = useSettings();
+  const { activeWordbanks } = useActiveWordbanks();
   const { toCode } = useCangjie();
   const { handleKeydown, wordQueue, currentWordProgress, codeInput } = usePractice({
     wordbanks: wordbanks,
-    activeWordbanks: settings.activeWordbanks,
+    activeWordbanks: activeWordbanks,
     toCode: toCode,
     setLookupCharacter: setLookupCharacter
   });
@@ -40,7 +42,7 @@ function AppWithContext() {
         handleKeydown={handleKeydown}
         setLookupCharacter={setLookupCharacter}
       />
-      <Dashboard settings={settings} setSetting={setSetting} />
+      <Dashboard />
       <div className="Footer">
         <a href="https://github.com/joshvictor1024/type-cangjie">
           <svg className="Footer__github" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
