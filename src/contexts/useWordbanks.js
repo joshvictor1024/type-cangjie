@@ -1,7 +1,13 @@
-import { useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import useDebounceDependency from "../hooks/useDebounceDependency";
 
-export default function useWordbanks() {
+const WordbanksContext = createContext({
+  workbanks: {}
+});
+
+function WordbanksProvider(props) {
   const [wordbanks, setWordbanks] = useState({});
+  const debouncedWordbanks = useDebounceDependency(wordbanks, {}, 100, { falling: true });
   async function loadDefaults() {
     try {
       const res = await fetch("wordbank/defaults.json");
@@ -58,5 +64,11 @@ export default function useWordbanks() {
     })();
   }, []);
 
-  return { wordbanks };
+  return <WordbanksContext.Provider value={{ wordbanks: debouncedWordbanks }} {...props} />;
 }
+
+function useWordbanks() {
+  return useContext(WordbanksContext);
+}
+
+export { WordbanksProvider, useWordbanks };

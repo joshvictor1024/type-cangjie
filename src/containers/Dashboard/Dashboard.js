@@ -13,14 +13,14 @@ function Tab({ tab, activeTab, setActiveTab, title }) {
   );
 }
 
-export default function Dashboard({ wordbanks, settings, setSetting }) {
+export default function Dashboard({ settings, setSetting }) {
   const [activeTab, setActiveTab] = useState("wordbanks");
   const panel = (() => {
     switch (activeTab) {
       case "keyboard":
         return null;
       case "wordbanks":
-        return <Wordbanks wordbanks={wordbanks} settings={settings} setSetting={setSetting} />;
+        return <Wordbanks settings={settings} setSetting={setSetting} />;
       case "stats":
         return null;
       default:

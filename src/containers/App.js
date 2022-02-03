@@ -2,17 +2,27 @@ import React, { useState } from "react";
 import "./App.css";
 import Typing from "./Typing";
 import Dashboard from "./Dashboard/Dashboard";
-import useWordbank from "../hooks/useWordbank";
-import useCangjieCode from "../hooks/useCangjieCode";
 import usePractice from "../hooks/usePractice";
 import useSettings from "../hooks/useSettings";
 import Lookup from "./Lookup";
+import { WordbanksProvider, useWordbanks } from "../contexts/useWordbanks";
+import { CangjieProvider, useCangjie } from "../contexts/useCangjie";
 
 function App() {
+  return (
+    <WordbanksProvider>
+      <CangjieProvider>
+        <AppWithContext />
+      </CangjieProvider>
+    </WordbanksProvider>
+  );
+}
+
+function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
-  const { wordbanks } = useWordbank();
+  const { wordbanks } = useWordbanks();
   const { settings, setSetting } = useSettings();
-  const { toCode } = useCangjieCode();
+  const { toCode } = useCangjie();
   const { handleKeydown, wordQueue, currentWordProgress, codeInput } = usePractice({
     wordbanks: wordbanks,
     activeWordbanks: settings.activeWordbanks,
@@ -22,7 +32,7 @@ function App() {
 
   return (
     <div className="App">
-      <Lookup toCode={toCode} character={lookupCharacter} setCharacter={setLookupCharacter} />
+      <Lookup character={lookupCharacter} setCharacter={setLookupCharacter} />
       <Typing
         wordQueue={wordQueue}
         currentWordProgress={currentWordProgress}
@@ -30,7 +40,7 @@ function App() {
         handleKeydown={handleKeydown}
         setLookupCharacter={setLookupCharacter}
       />
-      <Dashboard wordbanks={wordbanks} settings={settings} setSetting={setSetting} />
+      <Dashboard settings={settings} setSetting={setSetting} />
       <div className="Footer">
         <a href="https://github.com/joshvictor1024/type-cangjie">
           <svg className="Footer__github" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
