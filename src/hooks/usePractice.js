@@ -24,6 +24,7 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
   function onKeyDown(key, t) {
     addKey(key, t);
     if (key === "Backspace") {
+      shouldClearInputFirstRef.current = false;
       setCodeInput((c) => c.slice(0, -1));
     } else if (key === "Space") {
       const characterCorrect = checkCharacterCorrect();
