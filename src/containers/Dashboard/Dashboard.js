@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./Dashboard.css";
 import Wordbanks from "./Wordbanks";
+import Stats from "./Stats";
 
 function Tab({ tab, activeTab, setActiveTab, title }) {
   return (
@@ -22,7 +23,7 @@ export default function Dashboard({ Keyboard }) {
       case "wordbanks":
         return <Wordbanks />;
       case "stats":
-        return null;
+        return <Stats />;
       default:
         throw new Error("unknown activeTab");
     }

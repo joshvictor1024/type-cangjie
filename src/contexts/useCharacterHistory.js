@@ -1,5 +1,5 @@
-import { useEffect, useRef } from "react";
-import useLocalStorage from "./useLocalStorage";
+import { createContext, useContext, useEffect, useRef } from "react";
+import useLocalStorage from "../hooks/useLocalStorage";
 import { getIsoDate } from "../util/isoDate";
 
 // character history:
@@ -24,7 +24,15 @@ function newCharacterHistory() {
 }
 const MAX_HISTORY_PER_CHARACTER_PER_DAY = 10;
 const MAX_KEY_TIME = 2000;
-export default function useCharacterHistory() {
+
+const CharacterHistoryContext = createContext({
+  history: {},
+  onKey: () => {},
+  onComposition: () => {},
+  clearCurrentComposition: () => {}
+});
+
+function CharacterHistoryProvider(props) {
   const { isAvailable, get: getHistory, set: setHistory } = useLocalStorage("history");
   const historyRef = useRef({});
   const currentCharacterHistoryRef = useRef(newCharacterHistory());
@@ -51,7 +59,9 @@ export default function useCharacterHistory() {
   }
   function onComposition(success, code, character) {
     if (success) {
-      if (currentCharacterHistoryRef.current[KEYS_PROPERTY].find(([key, time]) => time > MAX_KEY_TIME)) {
+      if (
+        currentCharacterHistoryRef.current[KEYS_PROPERTY].find(([key, time]) => time > MAX_KEY_TIME)
+      ) {
         console.log("idle");
         return;
       }
@@ -82,5 +92,16 @@ export default function useCharacterHistory() {
   function clearCurrentComposition() {
     currentCharacterHistoryRef.current = newCharacterHistory();
   }
-  return { onKey, onComposition, clearCurrentComposition };
+  return (
+    <CharacterHistoryContext.Provider
+      value={{ historyRef, onKey, onComposition, clearCurrentComposition }}
+      {...props}
+    />
+  );
 }
+
+function useCharacterHistory() {
+  return useContext(CharacterHistoryContext);
+}
+
+export { CharacterHistoryProvider, useCharacterHistory };

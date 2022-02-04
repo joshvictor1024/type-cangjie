@@ -9,13 +9,16 @@ import useScreenKeyboard from "../hooks/useScreenKeyboard";
 import { WordbanksProvider, useWordbanks } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider, useActiveWordbanks } from "../contexts/useActiveWordbanks";
 import { CangjieProvider } from "../contexts/useCangjie";
+import { CharacterHistoryProvider } from "../contexts/useCharacterHistory";
 
 function App() {
   return (
     <WordbanksProvider>
       <ActiveWordbanksProvider>
         <CangjieProvider>
-          <AppWithContext />
+          <CharacterHistoryProvider>
+            <AppWithContext />
+          </CharacterHistoryProvider>
         </CangjieProvider>
       </ActiveWordbanksProvider>
     </WordbanksProvider>
@@ -31,7 +34,7 @@ function AppWithContext() {
     activeWordbanks: activeWordbanks,
     setLookupCharacter: setLookupCharacter
   });
-  const {Keyboard, setKey: setScreenKeyboardKey} = useScreenKeyboard(enterKey);
+  const { Keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(enterKey);
 
   return (
     <div className="App">
@@ -40,8 +43,17 @@ function AppWithContext() {
         wordQueue={wordQueue}
         currentWordProgress={currentWordProgress}
         codeInput={codeInput}
-        handleKeyDown={(e) => { const k = toKey(e.code); if (k === null) return; enterKey(k); setScreenKeyboardKey(true, k)}}
-        handleKeyUp={(e) => { const k = toKey(e.code); if (k === null) return; setScreenKeyboardKey(false, k)}}
+        handleKeyDown={(e) => {
+          const k = toKey(e.code);
+          if (k === null) return;
+          enterKey(k);
+          setScreenKeyboardKey(true, k);
+        }}
+        handleKeyUp={(e) => {
+          const k = toKey(e.code);
+          if (k === null) return;
+          setScreenKeyboardKey(false, k);
+        }}
         setLookupCharacter={setLookupCharacter}
       />
       <Dashboard Keyboard={Keyboard} />

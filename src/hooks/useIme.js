@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import useCharacterHistory from "./useCharacterHistory";
 import { useCangjie } from "../contexts/useCangjie";
+import { useCharacterHistory } from "../contexts/useCharacterHistory";
 
 /**
  *
