@@ -18,29 +18,9 @@ export default function useIme({ getCompositionTarget, onComposition }) {
   const { toCode } = useCangjie();
   /**
    *
-   * @param {string} code KeyboardEvent.code
-   */
-  function enterCode(code) {
-    // TODO: confirm this
-    // cangjie radicals correspond to key positions, not letters,
-    // thus KeyboardEvent.code rather than KeyboardEvent.key
-    if (code.slice(0, 3) === "Key") {
-      // Letter keys all start with "Key"
-      // and end with an uppercase letter
-      // e.g. "KeyA"
-      const lowerCase = code.slice(3).toLowerCase();
-      onKey(lowerCase);
-    } else if (code === "Backspace") {
-      onKey("Backspace");
-    } else if (code === "Space") {
-      onKey("Space");
-    }
-  }
-  /**
-   *
    * @param {string} key [a-z|"Backspace"|"Space"]
    */
-  function onKey(key) {
+  function enterKey(key) {
     statsOnKey(key);
     if (key === "Backspace") {
       shouldClearDueToErrorRef.current = false;
@@ -78,5 +58,5 @@ export default function useIme({ getCompositionTarget, onComposition }) {
     statsClearCurrent();
   }
 
-  return { buffer, enterCode, clearBuffer };
+  return { buffer, enterKey, clearBuffer };
 }

@@ -4,6 +4,8 @@ import Typing from "./Typing";
 import Dashboard from "./Dashboard/Dashboard";
 import usePractice from "../hooks/usePractice";
 import Lookup from "./Lookup";
+import { toKey } from "../util/toInternalKey";
+import useScreenKeyboard from "../hooks/useScreenKeyboard";
 import { WordbanksProvider, useWordbanks } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider, useActiveWordbanks } from "../contexts/useActiveWordbanks";
 import { CangjieProvider } from "../contexts/useCangjie";
@@ -24,11 +26,12 @@ function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
   const { wordbanks } = useWordbanks();
   const { activeWordbanks } = useActiveWordbanks();
-  const { handleKeydown, wordQueue, currentWordProgress, codeInput } = usePractice({
+  const { enterKey, wordQueue, currentWordProgress, codeInput } = usePractice({
     wordbanks: wordbanks,
     activeWordbanks: activeWordbanks,
     setLookupCharacter: setLookupCharacter
   });
+  const {Keyboard, setKey: setScreenKeyboardKey} = useScreenKeyboard(enterKey);
 
   return (
     <div className="App">
@@ -37,10 +40,11 @@ function AppWithContext() {
         wordQueue={wordQueue}
         currentWordProgress={currentWordProgress}
         codeInput={codeInput}
-        handleKeydown={handleKeydown}
+        handleKeyDown={(e) => { const k = toKey(e.code); if (k === null) return; enterKey(k); setScreenKeyboardKey(true, k)}}
+        handleKeyUp={(e) => { const k = toKey(e.code); if (k === null) return; setScreenKeyboardKey(false, k)}}
         setLookupCharacter={setLookupCharacter}
       />
-      <Dashboard />
+      <Dashboard Keyboard={Keyboard} />
       <div className="Footer">
         <a href="https://github.com/joshvictor1024/type-cangjie">
           <svg className="Footer__github" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

@@ -1,0 +1,12 @@
+.ScreenKeyboard__cap {
+  fill: #ffffff
+}
+.ScreenKeyboard__text {
+  fill: #000000
+}
+.ScreenKeyboard__cap--down {
+  fill: #303030
+}
+.ScreenKeyboard__text--down {
+  fill: #ffffff
+}

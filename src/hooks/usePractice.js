@@ -44,10 +44,7 @@ export default function usePractice({ wordbanks, activeWordbanks, setLookupChara
       setLookupCharacter(character);
     }
   }
-  const { buffer, enterCode, clearBuffer } = useIme({ getCompositionTarget, onComposition });
-  function handleKeydown(e) {
-    enterCode(e.code);
-  }
+  const { buffer, enterKey, clearBuffer } = useIme({ getCompositionTarget, onComposition });
 
   function checkWordDone() {
     const w = wordQueue[0];
@@ -100,5 +97,5 @@ export default function usePractice({ wordbanks, activeWordbanks, setLookupChara
     });
   }, [wordQueue]);
 
-  return { handleKeydown, wordQueue, currentWordProgress, codeInput: buffer };
+  return { enterKey, wordQueue, currentWordProgress, codeInput: buffer };
 }
