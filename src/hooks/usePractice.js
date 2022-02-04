@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import useKeyboardEvent from "./useKeyboardEvent";
-import useCharacterHistory from "./useCharacterHistory";
+import { useState, useEffect } from "react";
+import useIme from "./useIme";
 
 const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
@@ -9,7 +8,7 @@ function getActiveWordbankList(activeWordbanks) {
   return Object.keys(activeWordbanks).filter((wordbankName) => activeWordbanks[wordbankName]);
 }
 
-export default function usePractice({ wordbanks, activeWordbanks, toCode, setLookupCharacter }) {
+export default function usePractice({ wordbanks, activeWordbanks, setLookupCharacter }) {
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
   function newCurrentWordProgress() {
@@ -18,83 +17,42 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
       correctCharacterCount: 0
     };
   }
-  const [codeInput, setCodeInput] = useState("");
-  const shouldClearInputFirstRef = useRef(false);
 
-  const { addKey, setError, setCode, beginCharacter, endCharacter } = useCharacterHistory();
-
-  function onKeyDown(key, t) {
-    addKey(key, t);
-    if (key === "Backspace") {
-      shouldClearInputFirstRef.current = false;
-      setCodeInput((c) => c.slice(0, -1));
-    } else if (key === "Space") {
-      const characterCorrect = checkCharacterCorrect();
-      if (characterCorrect === null) {
-        return;
-      }
-      if (characterCorrect) {
-        console.log("correct");
-        setCode(codeInput);
-        endCharacter();
-        if (checkWordDone()) {
-          if (wordQueue.length >= 2) {
-            beginCharacter(wordQueue[1][0]);
-          }
-          setWordQueue(wordQueue.slice(1));
-          setCurrentWordProgress(newCurrentWordProgress());
-          setCodeInput("");
-        } else {
-          beginCharacter(wordQueue[0][currentWordProgress.correctCharacterCount + 1]);
-          setCurrentWordProgress((c) => {
-            return {
-              hasWrongCharacter: false,
-              correctCharacterCount: c.correctCharacterCount + 1
-            };
-          });
-          setCodeInput("");
-        }
+  function getCompositionTarget() {
+    return wordQueue[0][currentWordProgress.correctCharacterCount];
+  }
+  function onComposition(success, _, character) {
+    if (success) {
+      if (checkWordDone()) {
+        setWordQueue(wordQueue.slice(1));
+        setCurrentWordProgress(newCurrentWordProgress());
       } else {
-        console.log("wrong");
-        setError();
-        shouldClearInputFirstRef.current = true;
         setCurrentWordProgress((c) => {
           return {
-            hasWrongCharacter: true,
-            correctCharacterCount: c.correctCharacterCount
+            hasWrongCharacter: false,
+            correctCharacterCount: c.correctCharacterCount + 1
           };
         });
-        setLookupCharacter(wordQueue[0][currentWordProgress.correctCharacterCount]);
       }
     } else {
-      // letter keys
-      if (shouldClearInputFirstRef.current) {
-        shouldClearInputFirstRef.current = false;
-        setCodeInput(key);
-        return;
-      }
-      setCodeInput((c) => {
-        if (c.length < 5) {
-          return c + key;
-        }
-        return c;
+      setCurrentWordProgress((c) => {
+        return {
+          hasWrongCharacter: true,
+          correctCharacterCount: c.correctCharacterCount
+        };
       });
+      setLookupCharacter(character);
     }
   }
-
-  function checkCharacterCorrect() {
-    if (wordQueue.length === 0) return null;
-
-    const ch = wordQueue[0][currentWordProgress.correctCharacterCount];
-    const codes = toCode(ch);
-    return codes.includes(codeInput);
+  const { buffer, enterCode, clearBuffer } = useIme({ getCompositionTarget, onComposition });
+  function handleKeydown(e) {
+    enterCode(e.code);
   }
+
   function checkWordDone() {
     const w = wordQueue[0];
     return currentWordProgress.correctCharacterCount + 1 === w.length;
   }
-
-  const { handleKeydown } = useKeyboardEvent(onKeyDown);
 
   function drawRandom(count) {
     console.log("draw");
@@ -125,11 +83,9 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
     if (getActiveWordbankList(activeWordbanks).length === 0) return;
     const words = drawRandom(WORD_QUEUE_MAX_WORDS);
     if (words === null) return;
-    beginCharacter(words[0]);
-    //console.log(words);
+    clearBuffer();
     setWordQueue(words);
     setCurrentWordProgress(newCurrentWordProgress());
-    setCodeInput("");
   }, [wordbanks, activeWordbanks]);
   useEffect(() => {
     if (getActiveWordbankList(activeWordbanks).length === 0) return;
@@ -144,5 +100,5 @@ export default function usePractice({ wordbanks, activeWordbanks, toCode, setLoo
     });
   }, [wordQueue]);
 
-  return { handleKeydown, wordQueue, currentWordProgress, codeInput };
+  return { handleKeydown, wordQueue, currentWordProgress, codeInput: buffer };
 }

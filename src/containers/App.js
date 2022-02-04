@@ -6,7 +6,7 @@ import usePractice from "../hooks/usePractice";
 import Lookup from "./Lookup";
 import { WordbanksProvider, useWordbanks } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider, useActiveWordbanks } from "../contexts/useActiveWordbanks";
-import { CangjieProvider, useCangjie } from "../contexts/useCangjie";
+import { CangjieProvider } from "../contexts/useCangjie";
 
 function App() {
   return (
@@ -24,11 +24,9 @@ function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
   const { wordbanks } = useWordbanks();
   const { activeWordbanks } = useActiveWordbanks();
-  const { toCode } = useCangjie();
   const { handleKeydown, wordQueue, currentWordProgress, codeInput } = usePractice({
     wordbanks: wordbanks,
     activeWordbanks: activeWordbanks,
-    toCode: toCode,
     setLookupCharacter: setLookupCharacter
   });
 

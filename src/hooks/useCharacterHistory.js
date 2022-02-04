@@ -22,8 +22,8 @@ function newHistory() {
 export default function useCharacterHistory() {
   const { isAvailable, get: getHistory, set: setHistory } = useLocalStorage("history");
   const historyRef = useRef({});
-  const currentWordRef = useRef("");
-  const currentHistoryRef = useRef(null);
+  const currentCharacterHistoryRef = useRef(newHistory());
+  const lastKeyTimeRef = useRef(Date.now());
 
   useEffect(() => {
     if (isAvailable()) {
@@ -34,38 +34,39 @@ export default function useCharacterHistory() {
     }
   }, []);
 
-  function beginCharacter(word) {
-    currentWordRef.current = word;
-    currentHistoryRef.current = newHistory();
-    //console.log("begin", currentWordRef.current);
+  /**
+   *
+   * @param {string} key [a-z|"Backspace"|"Space"]
+   */
+  function onKey(key) {
+    const now = Date.now();
+    const dt = now - lastKeyTimeRef.current;
+    currentCharacterHistoryRef.current[KEYS_PROPERTY].push([key, dt]);
+    lastKeyTimeRef.current = now;
   }
-  function addKey(key, t) {
-    currentHistoryRef.current[KEYS_PROPERTY].push([key, t]);
-  }
-  function setError() {
-    currentHistoryRef.current[HAS_ERROR_PROPERTY] = true;
-  }
-  function setCode(code) {
-    currentHistoryRef.current[CODE_PROPERTY] = code;
-  }
-  function endCharacter() {
-    //console.log("end", currentWordRef.current);
-    if (!historyRef.current[currentWordRef.current]) {
-      historyRef.current[currentWordRef.current] = [];
-    }
-    const ch = historyRef.current[currentWordRef.current];
+  function onComposition(success, code, character) {
+    if (success) {
+      currentCharacterHistoryRef.current[CODE_PROPERTY] = code;
 
-    ch.push(currentHistoryRef.current);
-    if (ch.length > 10) {
-      ch.shift();
-    }
-    currentWordRef.current = "";
-    currentHistoryRef.current = newHistory();
+      if (!historyRef.current[character]) {
+        historyRef.current[character] = [];
+      }
+      const characterHistories = historyRef.current[character];
+      characterHistories.push(currentCharacterHistoryRef.current);
+      if (characterHistories.length > 10) {
+        characterHistories.shift();
+      }
+      currentCharacterHistoryRef.current = newHistory();
 
-    if (isAvailable()) {
-      setHistory(historyRef.current);
+      if (isAvailable()) {
+        setHistory(historyRef.current);
+      }
+    } else {
+      currentCharacterHistoryRef.current[HAS_ERROR_PROPERTY] = true;
     }
   }
-
-  return { addKey, setError, setCode, beginCharacter, endCharacter };
+  function clearCurrentComposition() {
+    currentCharacterHistoryRef.current = newHistory();
+  }
+  return { onKey, onComposition, clearCurrentComposition };
 }
