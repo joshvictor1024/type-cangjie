@@ -1,28 +1,33 @@
 import { useEffect, useRef } from "react";
 import useLocalStorage from "./useLocalStorage";
+import { getIsoDate } from "../util/isoDate";
 
 // character history:
-// [
-//   {
-//     code: String
-//     keys: [[key: String, t: Number]]
-//     hasError: Boolean
+// {
+//   isoDate: String: {
+//     character: String: {
+//       code: String
+//       keys: [key: String, time: Number]
+//       hasError: Boolean
+//     }
 //   }
-// ]
+// }
 const CODE_PROPERTY = "c";
 const KEYS_PROPERTY = "k";
 const HAS_ERROR_PROPERTY = "e";
-function newHistory() {
+function newCharacterHistory() {
   return {
     [CODE_PROPERTY]: "",
     [KEYS_PROPERTY]: [],
     [HAS_ERROR_PROPERTY]: false
   };
 }
+const MAX_HISTORY_PER_CHARACTER_PER_DAY = 10;
+const MAX_KEY_TIME = 2000;
 export default function useCharacterHistory() {
   const { isAvailable, get: getHistory, set: setHistory } = useLocalStorage("history");
   const historyRef = useRef({});
-  const currentCharacterHistoryRef = useRef(newHistory());
+  const currentCharacterHistoryRef = useRef(newCharacterHistory());
   const lastKeyTimeRef = useRef(Date.now());
 
   useEffect(() => {
@@ -46,17 +51,26 @@ export default function useCharacterHistory() {
   }
   function onComposition(success, code, character) {
     if (success) {
+      if (currentCharacterHistoryRef.current[KEYS_PROPERTY].find(([key, time]) => time > MAX_KEY_TIME)) {
+        console.log("idle");
+        return;
+      }
       currentCharacterHistoryRef.current[CODE_PROPERTY] = code;
 
-      if (!historyRef.current[character]) {
-        historyRef.current[character] = [];
+      const isoDate = getIsoDate();
+      if (!historyRef.current[isoDate]) {
+        historyRef.current[isoDate] = {};
       }
-      const characterHistories = historyRef.current[character];
+      const todayHistory = historyRef.current[isoDate];
+      if (!todayHistory[character]) {
+        todayHistory[character] = [];
+      }
+      const characterHistories = todayHistory[character];
       characterHistories.push(currentCharacterHistoryRef.current);
-      if (characterHistories.length > 10) {
+      if (characterHistories.length > MAX_HISTORY_PER_CHARACTER_PER_DAY) {
         characterHistories.shift();
       }
-      currentCharacterHistoryRef.current = newHistory();
+      currentCharacterHistoryRef.current = newCharacterHistory();
 
       if (isAvailable()) {
         setHistory(historyRef.current);
@@ -66,7 +80,7 @@ export default function useCharacterHistory() {
     }
   }
   function clearCurrentComposition() {
-    currentCharacterHistoryRef.current = newHistory();
+    currentCharacterHistoryRef.current = newCharacterHistory();
   }
   return { onKey, onComposition, clearCurrentComposition };
 }
