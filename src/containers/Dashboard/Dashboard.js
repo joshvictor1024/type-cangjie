@@ -18,10 +18,10 @@ export default function Dashboard({ Keyboard }) {
   const [activeTab, setActiveTab] = useState("wordbanks");
   const panel = (() => {
     switch (activeTab) {
-      case "keyboard":
-        return <Keyboard />;
       case "wordbanks":
         return <Wordbanks />;
+      case "keyboard":
+        return <Keyboard />;
       case "stats":
         return <Stats />;
       default:
@@ -32,15 +32,12 @@ export default function Dashboard({ Keyboard }) {
     <div className="Dashboard">
       <div className="Dashboard__tabs">
         <div className="row">
-          {/* mock items */}
-          <Tab tab="keyboard" activeTab={activeTab} setActiveTab={setActiveTab} title="虛擬鍵盤" />
           <Tab tab="wordbanks" activeTab={activeTab} setActiveTab={setActiveTab} title="選擇詞庫" />
+          <Tab tab="keyboard" activeTab={activeTab} setActiveTab={setActiveTab} title="虛擬鍵盤" />
           <Tab tab="stats" activeTab={activeTab} setActiveTab={setActiveTab} title="統計資料" />
         </div>
       </div>
-      <div className="Dashboard__panel">
-        {panel}
-      </div>
+      <div className="Dashboard__panel">{panel}</div>
     </div>
   );
 }

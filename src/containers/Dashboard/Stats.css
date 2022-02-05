@@ -1,0 +1,30 @@
+.Stats h3 {
+  margin: 1rem auto;
+}
+.Stats__toolbar {
+  position: sticky;
+  top: 0px;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.2rem;
+  background-color: #f3f3f3;
+  border: 1px solid black;
+}
+.Stats__refresh {
+  padding: 0px 0.2rem;
+}
+.GeneralStats th {
+  padding-right: 1rem;
+  text-align: left;
+  cursor: help;
+}
+.GeneralStats td {
+  text-align: right;
+}
+.KeyStats th {
+  padding-left: 1rem;
+  text-align: right;
+}
+.KeyStats td {
+  text-align: right;
+}
