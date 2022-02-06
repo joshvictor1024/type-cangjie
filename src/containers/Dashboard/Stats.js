@@ -1,7 +1,5 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import "./Stats.css";
-import useDownloadJson from "../../hooks/useDownloadJson";
-import useUploadJson from "../../hooks/useUploadJson";
 import { useCharacterHistory } from "../../contexts/useCharacterHistory";
 import { useCangjie } from "../../contexts/useCangjie";
 
@@ -172,14 +170,11 @@ function KeyStatsTable({ keysTimes }) {
 }
 
 export default function Stats() {
-  const { historyRef, setHistory } = useCharacterHistory();
+  const { historyRef } = useCharacterHistory();
   const [renderedHistory, setRenderedHistory] = useState(historyRef.current);
   const dateStatsRef = useRef();
   const sortedDatesRef = useRef();
   const [selectedDate, setSelectedDate] = useState(null);
-  const { DownloadAnchor, downloadJson } = useDownloadJson();
-  const fileInputRef = useRef();
-  const getFromFile = useUploadJson(setHistory);
 
   useLayoutEffect(() => {
     dateStatsRef.current = getDateStats(renderedHistory);
@@ -216,16 +211,6 @@ export default function Stats() {
             </select>
           </label>
         ) : null}
-      </div>
-      <div className="row">
-        <DownloadAnchor />
-        <button onClick={() => downloadJson(historyRef.current, "type-cangjie-history.json")}>
-          下載歷史
-        </button>
-      </div>
-      <div className="row">
-        <button onClick={() => getFromFile(fileInputRef.current.files[0])}>上傳歷史</button>
-        <input ref={fileInputRef} type="file" accept="application/json" />
       </div>
       {dateStatsRef.current ? (
         <>

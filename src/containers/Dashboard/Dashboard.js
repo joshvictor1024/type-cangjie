@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./Dashboard.css";
 import Wordbanks from "./Wordbanks";
 import Stats from "./Stats";
+import DataAndSettings from "./DataAndSettings";
 
 function Tab({ tab, activeTab, setActiveTab, title }) {
   return (
@@ -24,6 +25,8 @@ export default function Dashboard({ Keyboard }) {
         return <Keyboard />;
       case "stats":
         return <Stats />;
+      case "dataAndSettings":
+        return <DataAndSettings />;
       default:
         throw new Error("unknown activeTab");
     }
@@ -35,6 +38,7 @@ export default function Dashboard({ Keyboard }) {
           <Tab tab="wordbanks" activeTab={activeTab} setActiveTab={setActiveTab} title="選擇詞庫" />
           <Tab tab="keyboard" activeTab={activeTab} setActiveTab={setActiveTab} title="虛擬鍵盤" />
           <Tab tab="stats" activeTab={activeTab} setActiveTab={setActiveTab} title="統計資料" />
+          <Tab tab="dataAndSettings" activeTab={activeTab} setActiveTab={setActiveTab} title="資料與設定" />
         </div>
       </div>
       <div className="Dashboard__panel">{panel}</div>

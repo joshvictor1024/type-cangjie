@@ -1,0 +1,17 @@
+.DataAndSettings h3 {
+  margin: 1rem auto;
+}
+.DataAndSettings section {
+  padding-left: 0.5rem;
+}
+.DataAndSettings section > * {
+  margin: 0.1rem 0px;
+}
+.DataAndSettings button {
+  height: 1.5rem;
+  width: fit-content;
+  padding: 0px 1rem;
+}
+.DataAndSettings__fileInput {
+  margin-left: 1rem;
+}
