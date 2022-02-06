@@ -83,8 +83,9 @@ function getStatsAllDates(dateStats) {
 }
 
 function getSelectedStats(dateStats, selectedDate) {
-  if (dateStats)
+  if (dateStats && selectedDate) {
     return selectedDate === "all" ? getStatsAllDates(dateStats) : dateStats[selectedDate];
+  }
   return null;
 }
 
@@ -205,7 +206,7 @@ export default function Stats() {
     dateStatsRef.current = getDateStats(renderedHistory);
     sortedDatesRef.current = Object.keys(dateStatsRef.current).sort((a, b) => (a < b ? 1 : -1));
     const selectedDate = sortedDatesRef.current[0];
-    setSelectedDate(selectedDate);
+    if (selectedDate) setSelectedDate(selectedDate);
   }, [renderedHistory]);
 
   function handleChange(e) {
@@ -223,7 +224,7 @@ export default function Stats() {
         >
           重新整理
         </button>
-        {dateStatsRef.current ? (
+        {dateStatsRef.current && Object.keys(dateStatsRef.current).length ? (
           <label>
             選擇日期 &nbsp;
             <select name="date" value={selectedDate} onChange={handleChange}>
@@ -237,7 +238,7 @@ export default function Stats() {
           </label>
         ) : null}
       </div>
-      {dateStatsRef.current ? (
+      {selectedStats ? (
         <>
           <h3>一般</h3>
           <GeneralStatsTable {...selectedStats} />
