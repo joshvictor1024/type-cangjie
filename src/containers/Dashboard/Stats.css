@@ -16,6 +16,8 @@
 .GeneralStats th {
   padding-right: 1rem;
   text-align: left;
+}
+.GeneralStats__help {
   cursor: help;
 }
 .GeneralStats td {

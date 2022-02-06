@@ -29,24 +29,24 @@ export default function Lookup({ character, setCharacter }) {
             <tr>
               <th>倉頡三代</th>
               <td>{toRadicals(cj3Code)}</td>
-              <td>{cj3Code}</td>
+              <td className="Lookup__result-cell--english">{cj3Code}</td>
             </tr>
             <tr>
               <th>倉頡五代</th>
               <td>{toRadicals(cj5Code)}</td>
-              <td>{cj5Code}</td>
+              <td className="Lookup__result-cell--english">{cj5Code}</td>
             </tr>
             {cj5xCode ? (
               <tr>
                 <th></th>
                 <td>{toRadicals(cj5xCode)}</td>
-                <td>{cj5xCode}</td>
+                <td className="Lookup__result-cell--english">{cj5xCode}</td>
               </tr>
             ) : null}
             <tr>
               <th>微軟倉頡</th>
               <td>{toRadicals(cjmsCode)}</td>
-              <td>{cjmsCode}</td>
+              <td className="Lookup__result-cell--english">{cjmsCode}</td>
             </tr>
           </tbody>
         </table>

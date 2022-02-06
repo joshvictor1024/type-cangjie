@@ -77,6 +77,7 @@ function getDefaultKeyState() {
 function KeyLetter({ letter, radical, x, y, length, isDown, handleKeyDown, handleKeyUp }) {
   return (
     <svg
+      className="ScreenKeyboard__key"
       x={x}
       y={y}
       width={length}
@@ -117,6 +118,7 @@ function KeyLetter({ letter, radical, x, y, length, isDown, handleKeyDown, handl
 function KeyFunction({ name, x, y, w, h, isDown, handleKeyDown, handleKeyUp }) {
   return (
     <svg
+      className="ScreenKeyboard__key"
       x={x}
       y={y}
       width={w}
@@ -201,6 +203,6 @@ export default function useScreenKeyboard(enterKey) {
         </svg>
       </div>
     );
-  };
-  return {Keyboard, setKey};
+  }
+  return { Keyboard, setKey };
 }

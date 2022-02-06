@@ -93,44 +93,69 @@ function GeneralStatsTable({ totalComposition, errorComposition, totalTime, effe
     <table className="GeneralStats">
       <tbody>
         <tr>
-          <th title="成功從輸入列中清除的字數">總輸入字數</th>
+          <th className="GeneralStats__help" title="成功從輸入列中清除的字數">
+            總輸入字數
+          </th>
           <th></th>
           <td>{totalComposition}</td>
         </tr>
         <tr>
-          <th title="成功從輸入列中清除的文字中，有一次以上組字錯誤的字數">錯誤輸入字數</th>
+          <th
+            className="GeneralStats__help"
+            title="成功從輸入列中清除的文字中，有一次以上組字錯誤的字數"
+          >
+            錯誤輸入字數
+          </th>
           <th></th>
           <td>{errorComposition}</td>
         </tr>
         <tr>
-          <th title="成功從輸入列中清除的文字中，沒有組字錯誤的字數比例">輸入正確率</th>
+          <th
+            className="GeneralStats__help"
+            title="成功從輸入列中清除的文字中，沒有組字錯誤的字數比例"
+          >
+            輸入正確率
+          </th>
           <th>(%)</th>
           <td>{(((totalComposition - errorComposition) * 100) / totalComposition).toFixed(1)}</td>
         </tr>
         <tr>
-          <th title="所有按鍵輸入所花的時間">總輸入時間</th>
+          <th className="GeneralStats__help" title="所有按鍵輸入所花的時間">
+            總輸入時間
+          </th>
           <th>(秒)</th>
           <td>{(totalTime / 1000).toFixed(1)}</td>
         </tr>
         <tr>
-          <th title="扣除使用Backspace清除字母、以及組字錯誤所花費的時間">有效輸入時間</th>
+          <th
+            className="GeneralStats__help"
+            title="扣除使用Backspace清除字母、以及組字錯誤所花費的時間"
+          >
+            有效輸入時間
+          </th>
           <th>(秒)</th>
           <td>{(effectiveTime / 1000).toFixed(1)}</td>
         </tr>
         <tr>
-          <th title="總輸入時間中，有效輸入時間的比例">輸入時間效率</th>
+          <th className="GeneralStats__help" title="總輸入時間中，有效輸入時間的比例">
+            輸入時間效率
+          </th>
           <th>(%)</th>
           <td>{((effectiveTime * 100) / totalTime).toFixed(1)}</td>
         </tr>
         <tr>
-          <th title="(輸入字數 - 錯誤輸入字數) / 有效輸入時間">平均最佳速度</th>
+          <th className="GeneralStats__help" title="(輸入字數 - 錯誤輸入字數) / 有效輸入時間">
+            平均最佳速度
+          </th>
           <th>(字/分)</th>
           <td>
             {((totalComposition - errorComposition) / (effectiveTime / (1000 * 60))).toFixed(1)}
           </td>
         </tr>
         <tr>
-          <th title="輸入字數 / 總輸入時間">平均速度</th>
+          <th className="GeneralStats__help" title="輸入字數 / 總輸入時間">
+            平均速度
+          </th>
           <th>(字/分)</th>
           <td>{(totalComposition / (totalTime / (1000 * 60))).toFixed(1)}</td>
         </tr>
