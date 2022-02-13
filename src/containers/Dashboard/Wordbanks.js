@@ -23,10 +23,10 @@ function doPropertiesMatch(obj1, obj2) {
   return true;
 }
 
-export default function Wordbanks({ settings, setSetting }) {
+export default function Wordbanks() {
   const { wordbanks } = useWordbanks();
   const { activeWordbanks, setActiveWordbank } = useActiveWordbanks();
-  const [renderedWordbanks, setRenderedWordbanks] = useState({});
+  const [renderedWordbanks, setRenderedWordbanks] = useState([]);
 
   useEffect(() => {
     if (!doPropertiesMatch(renderedWordbanks, wordbanks)) {
@@ -41,16 +41,17 @@ export default function Wordbanks({ settings, setSetting }) {
   return (
     <div className="Wordbanks">
       <div className="column">
-        {/* TODO: item order */}
-        {Object.keys(renderedWordbanks).map((wordbankName) => (
-          <div className="Wordbanks__item" key={wordbankName}>
+        {renderedWordbanks.map((wordbank) => (
+          <div className="Wordbanks__item" key={wordbank.name}>
             <label>
-              {renderedWordbanks[wordbankName].display}
-              <input
-                type="checkbox"
-                checked={activeWordbanks[wordbankName]}
-                onChange={(e) => changeActiveWordbank(wordbankName, e.target.checked)}
-              />
+              {wordbank.displayName}
+              {wordbank.words ? (
+                <input
+                  type="checkbox"
+                  checked={activeWordbanks[wordbank.name]}
+                  onChange={(e) => changeActiveWordbank(wordbank.name, e.target.checked)}
+                />
+              ) : " 載入中..."}
             </label>
           </div>
         ))}

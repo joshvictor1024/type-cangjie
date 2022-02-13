@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import useIme from "./useIme";
+import { useWordbanks } from "../contexts/useWordbanks";
+import { useActiveWordbanks } from "../contexts/useActiveWordbanks";
 
 const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
@@ -8,7 +10,9 @@ function getActiveWordbankList(activeWordbanks) {
   return Object.keys(activeWordbanks).filter((wordbankName) => activeWordbanks[wordbankName]);
 }
 
-export default function usePractice({ wordbanks, activeWordbanks, setLookupCharacter }) {
+export default function usePractice({ setLookupCharacter }) {
+  const { wordbanks } = useWordbanks();
+  const { activeWordbanks } = useActiveWordbanks();
   const [wordQueue, setWordQueue] = useState([]);
   const [currentWordProgress, setCurrentWordProgress] = useState(null);
   function newCurrentWordProgress() {
@@ -54,7 +58,9 @@ export default function usePractice({ wordbanks, activeWordbanks, setLookupChara
   function drawRandom(count) {
     console.log("draw");
     const awbl = getActiveWordbankList(activeWordbanks);
-    const awb = awbl.map((wordbankName) => wordbanks[wordbankName]).filter((wb) => wb);
+    const awb = awbl
+      .map((wordbankName) => wordbanks.find((wb) => wb.name === wordbankName))
+      .filter((wb) => wb && wb.words);
     //console.log(awb);
     if (awb.length === 0) return null;
 

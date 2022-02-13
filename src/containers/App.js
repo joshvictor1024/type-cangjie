@@ -6,8 +6,8 @@ import usePractice from "../hooks/usePractice";
 import Lookup from "./Lookup";
 import { toKey } from "../util/toInternalKey";
 import useScreenKeyboard from "../hooks/useScreenKeyboard";
-import { WordbanksProvider, useWordbanks } from "../contexts/useWordbanks";
-import { ActiveWordbanksProvider, useActiveWordbanks } from "../contexts/useActiveWordbanks";
+import { WordbanksProvider } from "../contexts/useWordbanks";
+import { ActiveWordbanksProvider } from "../contexts/useActiveWordbanks";
 import { CangjieProvider } from "../contexts/useCangjie";
 import { CharacterHistoryProvider } from "../contexts/useCharacterHistory";
 
@@ -27,11 +27,7 @@ function App() {
 
 function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
-  const { wordbanks } = useWordbanks();
-  const { activeWordbanks } = useActiveWordbanks();
   const { enterKey, wordQueue, currentWordProgress, codeInput } = usePractice({
-    wordbanks: wordbanks,
-    activeWordbanks: activeWordbanks,
     setLookupCharacter: setLookupCharacter
   });
   const { Keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(enterKey);
