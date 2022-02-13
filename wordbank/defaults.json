@@ -1,9 +1,30 @@
 [
-  "common-character-l1",
-  "common-character-l2",
-  "common-character-l3",
-  "common-character-l4",
-  "common-character-l5",
-  "common-character-l6",
-  "common-character-l7"
+  {
+    "name": "common-character-l1",
+    "displayName": "國教院第一級漢字"
+  },
+  {
+    "name": "common-character-l2",
+    "displayName": "國教院第二級漢字"
+  },
+  {
+    "name": "common-character-l3",
+    "displayName": "國教院第三級漢字"
+  },
+  {
+    "name": "common-character-l4",
+    "displayName": "國教院第四級漢字"
+  },
+  {
+    "name": "common-character-l5",
+    "displayName": "國教院第五級漢字"
+  },
+  {
+    "name": "common-character-l6",
+    "displayName": "國教院第六級漢字"
+  },
+  {
+    "name": "common-character-l7",
+    "displayName": "國教院第七級漢字"
+  }
 ]

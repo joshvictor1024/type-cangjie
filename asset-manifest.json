@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/type-cangjie/static/css/main.56592908.css",
-    "main.js": "/type-cangjie/static/js/main.ae75a288.js",
-    "index.html": "/type-cangjie/index.html",
-    "main.56592908.css.map": "/type-cangjie/static/css/main.56592908.css.map",
-    "main.ae75a288.js.map": "/type-cangjie/static/js/main.ae75a288.js.map"
+    "main.css": "/static/css/main.56592908.css",
+    "main.js": "/static/js/main.765a6bb1.js",
+    "index.html": "/index.html",
+    "main.56592908.css.map": "/static/css/main.56592908.css.map",
+    "main.765a6bb1.js.map": "/static/js/main.765a6bb1.js.map"
   },
   "entrypoints": [
     "static/css/main.56592908.css",
-    "static/js/main.ae75a288.js"
+    "static/js/main.765a6bb1.js"
   ]
 }
