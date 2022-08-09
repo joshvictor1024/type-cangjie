@@ -1,18 +1,17 @@
 import React from "react";
 import "./Lookup.css";
-import { useCangjie } from "../contexts/useCangjie";
+import { useCangjie } from "../contexts/useCangjieDicts";
+import { keysToRadicals } from "../lib/typing/radical";
+import { reverseLookup } from "../lib/typing/compose";
 
 export default function Lookup({ character, setCharacter }) {
-  const { toCode, toRadicals } = useCangjie();
+  const { dicts } = useCangjie();
 
-  const cj3Codes = toCode(character, "3");
-  const cj5Codes = toCode(character, "5");
-  const cj5xCodes = toCode(character, "5x");
-  const cjmsCodes = toCode(character, "ms");
-  const cj3Code = cj3Codes[0] ? cj3Codes[0] : "";
-  const cj5Code = cj5Codes[0] ? cj5Codes[0] : "";
-  const cj5xCode = cj5xCodes[0] ? cj5xCodes[0] : "";
-  const cjmsCode = cjmsCodes[0] ? cjmsCodes[0] : "";
+  const cj3Code = (reverseLookup(character, dicts, "3") ?? [""])[0];
+  const cj5Code = (reverseLookup(character, dicts, "5") ?? [""])[0];
+  const cj5xCode = (reverseLookup(character, dicts, "5x") ?? [""])[0];
+  const cjmsCode = (reverseLookup(character, dicts, "ms") ?? [""])[0];
+
   return (
     <div className="Lookup">
       <input
@@ -28,24 +27,24 @@ export default function Lookup({ character, setCharacter }) {
           <tbody>
             <tr>
               <th>倉頡三代</th>
-              <td>{toRadicals(cj3Code)}</td>
+              <td>{keysToRadicals(Array.from(cj3Code))}</td>
               <td className="Lookup__result-cell--english">{cj3Code}</td>
             </tr>
             <tr>
               <th>倉頡五代</th>
-              <td>{toRadicals(cj5Code)}</td>
+              <td>{keysToRadicals(Array.from(cj5Code))}</td>
               <td className="Lookup__result-cell--english">{cj5Code}</td>
             </tr>
             {cj5xCode ? (
               <tr>
                 <th></th>
-                <td>{toRadicals(cj5xCode)}</td>
+                <td>{keysToRadicals(Array.from(cj5xCode))}</td>
                 <td className="Lookup__result-cell--english">{cj5xCode}</td>
               </tr>
             ) : null}
             <tr>
               <th>微軟倉頡</th>
-              <td>{toRadicals(cjmsCode)}</td>
+              <td>{keysToRadicals(Array.from(cjmsCode))}</td>
               <td className="Lookup__result-cell--english">{cjmsCode}</td>
             </tr>
           </tbody>

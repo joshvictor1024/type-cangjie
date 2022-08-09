@@ -48,7 +48,7 @@ export default function usePractice({ setLookupCharacter }) {
       setLookupCharacter(character);
     }
   }
-  const { buffer, enterKey, clearBuffer } = useIme({ getCompositionTarget, onComposition });
+  const { ime, enterKey, clearBuffer } = useIme({ getCompositionTarget, onComposition });
 
   function checkWordDone() {
     const w = wordQueue[0];
@@ -103,5 +103,5 @@ export default function usePractice({ setLookupCharacter }) {
     });
   }, [wordQueue]);
 
-  return { enterKey, wordQueue, currentWordProgress, codeInput: buffer };
+  return { enterKey, wordQueue, currentWordProgress, ime };
 }

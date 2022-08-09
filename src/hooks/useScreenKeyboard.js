@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useCangjie } from "../contexts/useCangjie";
+import { keysToRadicals } from "../lib/typing/radical";
 import "./ScreenKeyboard.css";
 
 const keyLength = 100;
@@ -150,7 +150,6 @@ function KeyFunction({ name, x, y, w, h, isDown, handleKeyDown, handleKeyUp }) {
  * [a-z]|"Backspace"|"Space"
  */
 export default function useScreenKeyboard(enterKey) {
-  const { toRadicals } = useCangjie();
   const [keyState, setKeyState] = useState(getDefaultKeyState());
   function setKey(down, key) {
     setKeyState((c) => {
@@ -181,7 +180,7 @@ export default function useScreenKeyboard(enterKey) {
             <KeyLetter
               key={letter}
               letter={letter}
-              radical={toRadicals(letter)}
+              radical={keysToRadicals([letter])}
               {...getKeyPosition(keyLetter[letter])}
               length={keyLength}
               isDown={keyState[letter]}

@@ -1,12 +1,12 @@
 import React from "react";
 import "./Typing.css";
 import Word from "./Word";
-import Input from "./Input";
+import Composer from "./Composer";
 
 export default function Typing({
   wordQueue,
   currentWordProgress,
-  codeInput,
+  composerKeys,
   handleKeyDown,
   handleKeyUp,
   setLookupCharacter
@@ -31,7 +31,7 @@ export default function Typing({
             ))
           : "選擇任一字庫以繼續..."}
       </div>
-      <Input code={codeInput} />
+      <Composer keys={composerKeys} />
     </div>
   );
 }

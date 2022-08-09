@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import "./Stats.css";
 import { useCharacterHistory } from "../../contexts/useCharacterHistory";
-import { useCangjie } from "../../contexts/useCangjie";
+import { keysToRadicals } from "../../lib/typing/radical";
 
 function getCharacterStats(code, keys, error) {
   code = Array.from(code);
@@ -166,7 +166,6 @@ function GeneralStatsTable({ totalComposition, errorComposition, totalTime, effe
 }
 
 function KeyStatsTable({ keysTimes }) {
-  const { toRadicals } = useCangjie();
   const keysAverageTime = Object.keys(keysTimes).reduce((acc, cur) => {
     const times = keysTimes[cur];
     acc[cur] = Math.floor(times.reduce((acc, cur) => acc + cur) / times.length);
@@ -184,7 +183,7 @@ function KeyStatsTable({ keysTimes }) {
           .sort((key1, key2) => keysAverageTime[key2] - keysAverageTime[key1])
           .map((key) => (
             <tr key={key}>
-              <td>{key === "Space" ? "" : toRadicals(key)}</td>
+              <td>{key === "Space" ? "" : keysToRadicals([key])}</td>
               <td>{key}</td>
               <td>{keysTimes[key].length}</td>
               <td>{keysAverageTime[key]}</td>

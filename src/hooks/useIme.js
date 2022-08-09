@@ -1,6 +1,8 @@
-import { useState, useRef } from "react";
-import { useCangjie } from "../contexts/useCangjie";
+import { useState } from "react";
+import { useCangjie } from "../contexts/useCangjieDicts";
 import { useCharacterHistory } from "../contexts/useCharacterHistory";
+import { createIme } from "../lib/typing/ime";
+import * as compose from "../lib/typing/compose";
 
 /**
  *
@@ -8,14 +10,14 @@ import { useCharacterHistory } from "../contexts/useCharacterHistory";
  * @param {Function} onComposition (success, code, character)
  */
 export default function useIme({ getCompositionTarget, onComposition }) {
-  const [buffer, setBuffer] = useState("");
-  const shouldClearDueToErrorRef = useRef(false);
+  const [ime, setIme] = useState(createIme());
   const {
     onKey: statsOnKey,
     onComposition: statsOnComposition,
     clearCurrentComposition: statsClearCurrent
   } = useCharacterHistory();
-  const { toCode } = useCangjie();
+
+  const { dicts } = useCangjie();
   /**
    *
    * @param {string} key [a-z|"Backspace"|"Space"]
@@ -23,40 +25,41 @@ export default function useIme({ getCompositionTarget, onComposition }) {
   function enterKey(key) {
     statsOnKey(key);
     if (key === "Backspace") {
-      shouldClearDueToErrorRef.current = false;
-      setBuffer((c) => c.slice(0, -1));
+      const newIme = compose.deleteComposerKey(ime);
+      setIme({ ...newIme });
     } else if (key === "Space") {
-      const char = getCompositionTarget();
-      if (char === null) {
+      if (dicts === null) {
+        console.log("dicts is not ready, aborting composition");
         return;
       }
-      const composeSuccess = toCode(char).includes(buffer);
-      if (composeSuccess) {
-        console.log("compose success");
-        onComposition(true, buffer, char);
-        statsOnComposition(true, buffer, char);
-        clearBuffer();
+
+      const char = getCompositionTarget();
+      const newIme = compose.attemptComposition(ime, char, dicts, "ms");
+      if (newIme !== null) {
+        setIme({ ...newIme });
+      }
+      if (newIme.hasComposerFailure) {
+        console.log("composer failure");
+        onComposition(false, ime.composerKeys, char);
+        statsOnComposition(false, ime.composerKeys, char);
       } else {
-        console.log("compose failure");
-        onComposition(false, buffer, char);
-        statsOnComposition(false, buffer, char);
-        shouldClearDueToErrorRef.current = true;
+        console.log("composer success");
+        onComposition(true, ime.composerKeys, char);
+        statsOnComposition(true, ime.composerKeys, char);
       }
     } else {
-      // letter keys
-      if (shouldClearDueToErrorRef.current) {
-        shouldClearDueToErrorRef.current = false;
-        setBuffer(key);
-      } else {
-        setBuffer((c) => (c + key).slice(0, 5));
+      const newIme = compose.addComposerKey(ime, key);
+      if (newIme !== null) {
+        setIme({ ...newIme });
       }
     }
   }
 
   function clearBuffer() {
-    setBuffer("");
+    const newIme = compose.clearComposerKeys(ime);
+    setIme({ ...newIme });
     statsClearCurrent();
   }
 
-  return { buffer, enterKey, clearBuffer };
+  return { ime, enterKey, clearBuffer };
 }

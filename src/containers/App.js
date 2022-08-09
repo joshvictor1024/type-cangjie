@@ -8,18 +8,18 @@ import { toKey } from "../util/toInternalKey";
 import useScreenKeyboard from "../hooks/useScreenKeyboard";
 import { WordbanksProvider } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider } from "../contexts/useActiveWordbanks";
-import { CangjieProvider } from "../contexts/useCangjie";
+import { CangjieDictsProvider } from "../contexts/useCangjieDicts";
 import { CharacterHistoryProvider } from "../contexts/useCharacterHistory";
 
 function App() {
   return (
     <WordbanksProvider>
       <ActiveWordbanksProvider>
-        <CangjieProvider>
+        <CangjieDictsProvider>
           <CharacterHistoryProvider>
             <AppWithContext />
           </CharacterHistoryProvider>
-        </CangjieProvider>
+        </CangjieDictsProvider>
       </ActiveWordbanksProvider>
     </WordbanksProvider>
   );
@@ -27,7 +27,7 @@ function App() {
 
 function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
-  const { enterKey, wordQueue, currentWordProgress, codeInput } = usePractice({
+  const { enterKey, wordQueue, currentWordProgress, ime } = usePractice({
     setLookupCharacter: setLookupCharacter
   });
   const { Keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(enterKey);
@@ -38,7 +38,7 @@ function AppWithContext() {
       <Typing
         wordQueue={wordQueue}
         currentWordProgress={currentWordProgress}
-        codeInput={codeInput}
+        composerKeys={ime.composerKeys}
         handleKeyDown={(e) => {
           const k = toKey(e.code);
           if (k === null) return;
