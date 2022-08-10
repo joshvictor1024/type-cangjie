@@ -9,16 +9,16 @@ import useScreenKeyboard from "../hooks/useScreenKeyboard";
 import { WordbanksProvider } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider } from "../contexts/useActiveWordbanks";
 import { CangjieDictsProvider } from "../contexts/useCangjieDicts";
-import { CharacterHistoryProvider } from "../contexts/useCharacterHistory";
+import { CompositionHistoryProvider } from "../contexts/useCharacterHistory";
 
 function App() {
   return (
     <WordbanksProvider>
       <ActiveWordbanksProvider>
         <CangjieDictsProvider>
-          <CharacterHistoryProvider>
+          <CompositionHistoryProvider>
             <AppWithContext />
-          </CharacterHistoryProvider>
+          </CompositionHistoryProvider>
         </CangjieDictsProvider>
       </ActiveWordbanksProvider>
     </WordbanksProvider>

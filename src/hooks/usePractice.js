@@ -25,7 +25,7 @@ export default function usePractice({ setLookupCharacter }) {
   function getCompositionTarget() {
     return wordQueue[0][currentWordProgress.correctCharacterCount];
   }
-  function onComposition(success, _, character) {
+  function onComposition(success, character) {
     if (success) {
       if (checkWordDone()) {
         setWordQueue(wordQueue.slice(1));

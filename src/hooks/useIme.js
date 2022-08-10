@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { useCangjie } from "../contexts/useCangjieDicts";
-import { useCharacterHistory } from "../contexts/useCharacterHistory";
+import { useCompositionHistory } from "../contexts/useCharacterHistory";
 import { createIme } from "../lib/typing/ime";
 import * as compose from "../lib/typing/compose";
 
 /**
  *
  * @param {Function} getCompositionTarget Return character as a string. Return `null` if no target exists
- * @param {Function} onComposition (success, code, character)
+ * @param {Function} onComposition (success, character)
  */
 export default function useIme({ getCompositionTarget, onComposition }) {
   const [ime, setIme] = useState(createIme());
   const {
-    onKey: statsOnKey,
-    onComposition: statsOnComposition,
+    onKey: chOnKey,
+    onComposition: chOnComposition,
     clearCurrentComposition: statsClearCurrent
-  } = useCharacterHistory();
+  } = useCompositionHistory();
 
   const { dicts } = useCangjie();
   /**
@@ -23,7 +23,7 @@ export default function useIme({ getCompositionTarget, onComposition }) {
    * @param {string} key [a-z|"Backspace"|"Space"]
    */
   function enterKey(key) {
-    statsOnKey(key);
+    chOnKey(key);
     if (key === "Backspace") {
       const newIme = compose.deleteComposerKey(ime);
       setIme({ ...newIme });
@@ -36,16 +36,16 @@ export default function useIme({ getCompositionTarget, onComposition }) {
       const char = getCompositionTarget();
       const newIme = compose.attemptComposition(ime, char, dicts, "ms");
       if (newIme !== null) {
+        if (newIme.hasComposerFailure) {
+          console.log("composer failure");
+          onComposition(false, char);
+          chOnComposition(false, null, char);
+        } else {
+          console.log("composer success");
+          onComposition(true, char);
+          chOnComposition(true, newIme.lastSubmission[1], char);
+        }
         setIme({ ...newIme });
-      }
-      if (newIme.hasComposerFailure) {
-        console.log("composer failure");
-        onComposition(false, ime.composerKeys, char);
-        statsOnComposition(false, ime.composerKeys, char);
-      } else {
-        console.log("composer success");
-        onComposition(true, ime.composerKeys, char);
-        statsOnComposition(true, ime.composerKeys, char);
       }
     } else {
       const newIme = compose.addComposerKey(ime, key);

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef } from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { getIsoDate, validateIsoDate } from "../util/isoDate";
+import * as ch from "../lib/typing/compositionHistory";
 
 // character history:
 // {
@@ -12,72 +13,21 @@ import { getIsoDate, validateIsoDate } from "../util/isoDate";
 //     }]
 //   }
 // }
-const CODE_PROPERTY = "c";
-const KEYS_PROPERTY = "k";
-const HAS_ERROR_PROPERTY = "e";
-function newCharacterHistory() {
-  return {
-    [CODE_PROPERTY]: "",
-    [KEYS_PROPERTY]: [],
-    [HAS_ERROR_PROPERTY]: false
-  };
-}
+
 const MAX_HISTORY_PER_CHARACTER_PER_DAY = 10;
 const MAX_KEY_TIME = 1500;
-function validateCharacterHistory(obj) {
+function validateChs(obj) {
   try {
     let flag = false;
-
-    const c = obj[CODE_PROPERTY];
-    flag |= typeof c !== "string";
-    flag |= c.length === 0 || c.length > 5;
-    if (flag) {
-      console.log("invalid code");
-      return false;
-    }
-
-    const k = obj[KEYS_PROPERTY];
-    flag |= !Array.isArray(k);
-    k.forEach((v) => {
-      const [key, time] = v;
-      flag |= typeof key !== "string";
-      if (key.length > 1) {
-        flag |= key !== "Space" && key !== "Backspace";
-      }
-      flag |= key.length === 0;
-      flag |= typeof time !== "number";
-      flag |= time > MAX_KEY_TIME;
-      if (time > MAX_KEY_TIME) console.log(time);
-    });
-    if (flag) {
-      console.log("invalid keys");
-      return false;
-    }
-
-    const e = obj[HAS_ERROR_PROPERTY];
-    flag |= typeof e !== "boolean";
-    if (flag) {
-      console.log("invalid has error");
-      return false;
-    }
-
-    return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-}
-function validateCharacterHistories(obj) {
-  try {
-    let flag = false;
-    obj.forEach((v) => (flag |= !validateCharacterHistory(v)));
+    // obj.forEach((v) => (flag |= !validateCharacterHistory(v)));
+    obj.forEach((v) => (flag |= ch.validate(v, MAX_KEY_TIME) !== null));
     return !flag;
   } catch (e) {
     console.error(e);
     return false;
   }
 }
-function validateCharactersHistories(obj) {
+function validateCharactersChs(obj) {
   try {
     let flag = false;
 
@@ -90,7 +40,7 @@ function validateCharactersHistories(obj) {
       return false;
     }
 
-    Object.values(obj).forEach((v) => (flag |= !validateCharacterHistories(v)));
+    Object.values(obj).forEach((v) => (flag |= !validateChs(v)));
     if (flag) return false;
 
     return true;
@@ -106,7 +56,7 @@ function validateDatesHistory(obj) {
     Object.keys(obj).forEach((v) => (flag |= !validateIsoDate(v)));
     if (flag) return false;
 
-    Object.values(obj).forEach((v) => (flag |= !validateCharactersHistories(v)));
+    Object.values(obj).forEach((v) => (flag |= !validateCharactersChs(v)));
     if (flag) return false;
 
     return true;
@@ -115,7 +65,7 @@ function validateDatesHistory(obj) {
   }
 }
 
-const CharacterHistoryContext = createContext({
+const CompositionHistoryContext = createContext({
   history: {},
   setHistory: () => false,
   onKey: () => {},
@@ -123,10 +73,10 @@ const CharacterHistoryContext = createContext({
   clearCurrentComposition: () => {}
 });
 
-function CharacterHistoryProvider(props) {
+function CompositionHistoryProvider(props) {
   const { isAvailable, get: getHistory, set: setHistory } = useLocalStorage("history");
   const historyRef = useRef({});
-  const currentCharacterHistoryRef = useRef(newCharacterHistory());
+  const currentCHRef = useRef(ch.createCompositionHistory());
   const lastKeyTimeRef = useRef(Date.now());
 
   useEffect(() => {
@@ -145,18 +95,17 @@ function CharacterHistoryProvider(props) {
   function onKey(key) {
     const now = Date.now();
     const dt = now - lastKeyTimeRef.current;
-    currentCharacterHistoryRef.current[KEYS_PROPERTY].push([key, dt]);
     lastKeyTimeRef.current = now;
+    currentCHRef.current = ch.addKey(currentCHRef.current, key, dt);
   }
   function onComposition(success, code, character) {
     if (success) {
-      if (
-        currentCharacterHistoryRef.current[KEYS_PROPERTY].find(([key, time]) => time > MAX_KEY_TIME)
-      ) {
+      if (ch.hasIdle(currentCHRef.current, MAX_KEY_TIME)) {
         console.log("idle");
+        currentCHRef.current = ch.createCompositionHistory();
         return;
       }
-      currentCharacterHistoryRef.current[CODE_PROPERTY] = code;
+      currentCHRef.current = ch.setCode(currentCHRef.current, code);
 
       const isoDate = getIsoDate();
       if (!historyRef.current[isoDate]) {
@@ -167,21 +116,21 @@ function CharacterHistoryProvider(props) {
         todayHistory[character] = [];
       }
       const characterHistories = todayHistory[character];
-      characterHistories.push(currentCharacterHistoryRef.current);
+      characterHistories.push(currentCHRef.current);
       if (characterHistories.length > MAX_HISTORY_PER_CHARACTER_PER_DAY) {
         characterHistories.shift();
       }
-      currentCharacterHistoryRef.current = newCharacterHistory();
+      currentCHRef.current = ch.createCompositionHistory();
 
       if (isAvailable()) {
         setHistory(historyRef.current);
       }
     } else {
-      currentCharacterHistoryRef.current[HAS_ERROR_PROPERTY] = true;
+      currentCHRef.current = ch.setHasError(currentCHRef.current);
     }
   }
   function clearCurrentComposition() {
-    currentCharacterHistoryRef.current = newCharacterHistory();
+    currentCHRef.current = ch.createCompositionHistory();
   }
   function setHistoryExternal(obj) {
     const isValid = validateDatesHistory(obj);
@@ -196,7 +145,7 @@ function CharacterHistoryProvider(props) {
     return false;
   }
   return (
-    <CharacterHistoryContext.Provider
+    <CompositionHistoryContext.Provider
       value={{
         historyRef,
         setHistory: setHistoryExternal,
@@ -209,8 +158,8 @@ function CharacterHistoryProvider(props) {
   );
 }
 
-function useCharacterHistory() {
-  return useContext(CharacterHistoryContext);
+function useCompositionHistory() {
+  return useContext(CompositionHistoryContext);
 }
 
-export { CharacterHistoryProvider, useCharacterHistory };
+export { CompositionHistoryProvider, useCompositionHistory };

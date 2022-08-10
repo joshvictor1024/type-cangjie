@@ -102,12 +102,12 @@ export function attemptComposition(ime, character, cangjieDicts, cangjieVersion)
   }
 
   const matchingCodes = reverseLookup(character, cangjieDicts, cangjieVersion);
-
-  if (matchingCodes === null || matchingCodes.includes(ime.composerKeys.join("")) === false) {
+  const code = ime.composerKeys.join("")
+  if (matchingCodes === null || matchingCodes.includes(code) === false) {
     ime.hasComposerFailure = true;
     return ime;
   }
-  ime = submit(ime, character);
+  ime = submit(ime, character, code);
   return ime;
 }
 
@@ -115,11 +115,12 @@ export function attemptComposition(ime, character, cangjieDicts, cangjieVersion)
  * Indicate that a submission happened.
  * @param {Ime} ime
  * @param {string} character the character which is composed
+ * @param {string} code code used to compose `character`
  * @returns {Ime}
  */
-function submit(ime, character) {
+function submit(ime, character, code) {
   ime = clearComposerKeys(ime);
-  ime.lastSubmission = character;
+  ime.lastSubmission = [character, code];
   return ime;
 }
 

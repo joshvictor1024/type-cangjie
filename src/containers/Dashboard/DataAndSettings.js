@@ -2,10 +2,10 @@ import React, { useRef } from "react";
 import "./DataAndSettings.css";
 import useDownloadJson from "../../hooks/useDownloadJson";
 import useUploadJson from "../../hooks/useUploadJson";
-import { useCharacterHistory } from "../../contexts/useCharacterHistory";
+import { useCompositionHistory } from "../../contexts/useCharacterHistory";
 
 export default function DataAndSettings() {
-  const { historyRef, setHistory } = useCharacterHistory();
+  const { historyRef, setHistory } = useCompositionHistory();
   const { DownloadAnchor, downloadJson } = useDownloadJson();
   const getFromFile = useUploadJson(
     (json) => {
