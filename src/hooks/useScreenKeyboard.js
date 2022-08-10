@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { keysToRadicals } from "../lib/typing/radical";
+import { radicalKeysToRadicals } from "../lib/typing/key";
 import "./ScreenKeyboard.css";
 
 const keyLength = 100;
@@ -180,7 +180,7 @@ export default function useScreenKeyboard(enterKey) {
             <KeyLetter
               key={letter}
               letter={letter}
-              radical={keysToRadicals([letter])}
+              radical={radicalKeysToRadicals([letter])}
               {...getKeyPosition(keyLetter[letter])}
               length={keyLength}
               isDown={keyState[letter]}

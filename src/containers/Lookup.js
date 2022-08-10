@@ -1,7 +1,7 @@
 import React from "react";
 import "./Lookup.css";
 import { useCangjie } from "../contexts/useCangjieDicts";
-import { keysToRadicals } from "../lib/typing/radical";
+import { radicalKeysToRadicals } from "../lib/typing/key";
 import { reverseLookup } from "../lib/typing/compose";
 
 export default function Lookup({ character, setCharacter }) {
@@ -27,24 +27,24 @@ export default function Lookup({ character, setCharacter }) {
           <tbody>
             <tr>
               <th>倉頡三代</th>
-              <td>{keysToRadicals(Array.from(cj3Code))}</td>
+              <td>{radicalKeysToRadicals(Array.from(cj3Code))}</td>
               <td className="Lookup__result-cell--english">{cj3Code}</td>
             </tr>
             <tr>
               <th>倉頡五代</th>
-              <td>{keysToRadicals(Array.from(cj5Code))}</td>
+              <td>{radicalKeysToRadicals(Array.from(cj5Code))}</td>
               <td className="Lookup__result-cell--english">{cj5Code}</td>
             </tr>
             {cj5xCode ? (
               <tr>
                 <th></th>
-                <td>{keysToRadicals(Array.from(cj5xCode))}</td>
+                <td>{radicalKeysToRadicals(Array.from(cj5xCode))}</td>
                 <td className="Lookup__result-cell--english">{cj5xCode}</td>
               </tr>
             ) : null}
             <tr>
               <th>微軟倉頡</th>
-              <td>{keysToRadicals(Array.from(cjmsCode))}</td>
+              <td>{radicalKeysToRadicals(Array.from(cjmsCode))}</td>
               <td className="Lookup__result-cell--english">{cjmsCode}</td>
             </tr>
           </tbody>

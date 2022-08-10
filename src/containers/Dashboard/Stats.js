@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import "./Stats.css";
 import { useCharacterHistory } from "../../contexts/useCharacterHistory";
-import { keysToRadicals } from "../../lib/typing/radical";
+import { radicalKeysToRadicals } from "../../lib/typing/key";
 
 function getCharacterStats(code, keys, error) {
   code = Array.from(code);
@@ -183,7 +183,7 @@ function KeyStatsTable({ keysTimes }) {
           .sort((key1, key2) => keysAverageTime[key2] - keysAverageTime[key1])
           .map((key) => (
             <tr key={key}>
-              <td>{key === "Space" ? "" : keysToRadicals([key])}</td>
+              <td>{key === "Space" ? "" : radicalKeysToRadicals([key])}</td>
               <td>{key}</td>
               <td>{keysTimes[key].length}</td>
               <td>{keysAverageTime[key]}</td>

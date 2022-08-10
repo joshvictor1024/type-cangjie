@@ -4,7 +4,7 @@
  * @module typing
  */
 
-import radicalKeys from "./radicalKeys.json";
+import { isRadicalKey } from "./key.js";
 
 /**
  * @typedef {Object} CangjieDicts Entries should be set to null if dictionary is not available.
@@ -32,14 +32,6 @@ function isCangjieVersion(cangjieVersion) {
 }
 
 const COMPOSER_MAX_LENGTH = 5;
-
-/**
- * @param {string} key
- * @returns {boolean}
- */
-export function isRadicalKey(key) {
-  return Object.keys(radicalKeys).includes(key);
-}
 
 /**
  * Append `key` to the `composerKeys`. Has no effect if already full.

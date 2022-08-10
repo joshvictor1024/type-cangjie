@@ -1,7 +1,7 @@
 import React from "react";
 import "./Composer.css";
-import { keysToRadicals } from "../lib/typing/radical"
+import { radicalKeysToRadicals } from "../lib/typing/key"
 
-export default function Composer({ keys }) {
-  return <div className="Composer">{keys?.length !== 0 ? keysToRadicals(keys) : "　"}</div>;
+export default function Composer({ radicalKeys }) {
+  return <div className="Composer">{radicalKeys?.length !== 0 ? radicalKeysToRadicals(radicalKeys) : "　"}</div>;
 }

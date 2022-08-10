@@ -31,7 +31,7 @@ export default function Typing({
             ))
           : "選擇任一字庫以繼續..."}
       </div>
-      <Composer keys={composerKeys} />
+      <Composer radicalKeys={composerKeys} />
     </div>
   );
 }
