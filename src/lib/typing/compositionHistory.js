@@ -110,3 +110,63 @@ export function setHasError(ch) {
   ch.e = true;
   return ch;
 }
+
+/**
+ * Information extracted from a `CompositionHistory` object.
+ * @typedef {Object} CompositionHistoryStats
+ * @property {boolean} compositionError whether any composition error happened
+ * @property {number} totalTime time used for all key presses
+ * @property {number} effectiveTime time used for effective key presses
+ * @property {Object.<string, number[]>} keysTimes time used to type each key
+ */
+
+/**
+ * Extract information from `ch`.
+ * @param {CompositionHistory} ch
+ * @returns {CompositionHistoryStats}
+ */
+export function getStats(ch) {
+  // Make copies so as not to modify `ch`.
+  const codeArray = Array.from(ch.c);
+  const keys = [...ch.k];
+
+  const stats = {
+    compositionError: ch.e,
+    totalTime: 0,
+    effectiveTime: 0,
+    keysTimes: {}
+  };
+
+  // Process from the end of `keys`.
+  while (keys.length) {
+    const [key, time] = keys.pop();
+
+    // Always accumulate total time.
+    stats.totalTime += time;
+
+    // Calculate effective time by comparing with `codeArray`.
+    if (key === "Backspace") {
+      continue;
+    } else if (key === "Space") {
+      // Only count the last "Space", which contributes to the successful composition, as effective.
+      if (stats.keysTimes["Space"] == null) {
+        stats.keysTimes["Space"] = [time];
+        stats.effectiveTime += time;
+      }
+    } else {
+      // Only count `key` as effective if it contributes to the successful composition.
+      if (codeArray.length === 0) {
+        continue;
+      } else if (key === codeArray[codeArray.length - 1]) {
+        codeArray.pop();
+        if (stats.keysTimes[key] == null) {
+          stats.keysTimes[key] = [];
+        }
+        stats.keysTimes[key].push(time);
+        stats.effectiveTime += time;
+      }
+    }
+  }
+
+  return stats;
+}

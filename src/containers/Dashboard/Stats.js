@@ -2,53 +2,13 @@ import React, { useState, useLayoutEffect, useRef } from "react";
 import "./Stats.css";
 import { useCompositionHistory } from "../../contexts/useCharacterHistory";
 import { radicalKeysToRadicals } from "../../lib/typing/key";
-
-function getCharacterStats(code, keys, error) {
-  code = Array.from(code);
-  const result = {
-    totalComposition: 1,
-    errorComposition: error ? 1 : 0,
-    totalTime: 0,
-    effectiveTime: 0,
-    keysTimes: {}
-  };
-  //console.log(keys, code);
-  while (code.length) {
-    if (keys.length === 0) {
-      throw new Error("getKeyTimes parse error");
-    }
-    const [key, time] = keys.pop();
-    result.totalTime += time;
-    if (key === "Space") {
-      if (!result.keysTimes.Space) {
-        result.keysTimes.Space = [time];
-        result.effectiveTime += time;
-      }
-    } else if (key === "Backspace") {
-      continue;
-    } else {
-      if (key === code[code.length - 1]) {
-        if (!result.keysTimes[key]) {
-          result.keysTimes[key] = [];
-        }
-        result.keysTimes[key].push(time);
-        result.effectiveTime += time;
-        code.pop();
-      }
-    }
-  }
-  while (keys.length) {
-    const [, time] = keys.pop();
-    result.totalTime += time;
-  }
-  return result;
-}
+import { getStats } from "../../lib/typing/compositionHistory";
 
 function accumulateStats(statsArray) {
   return Object.values(statsArray).reduce(
     (acc, stats) => {
-      acc.totalComposition += stats.totalComposition;
-      acc.errorComposition += stats.errorComposition;
+      acc.totalComposition++;
+      acc.errorComposition += stats.compositionError ? 1 : 0;
       acc.totalTime += stats.totalTime;
       acc.effectiveTime += stats.effectiveTime;
       Object.keys(stats.keysTimes).forEach((key) => {
@@ -67,9 +27,9 @@ function getDateStats(history) {
   const dates = Object.keys(history);
   return dates.reduce((acc, date) => {
     const dateHistory = history[date];
-    const dateAllCharacterStats = Object.values(dateHistory).map((dateCharacterHistories) => {
-      const dateCharacterStats = dateCharacterHistories.map((characterHistory) =>
-        getCharacterStats(characterHistory.c, [...characterHistory.k], characterHistory.e)
+    const dateAllCharacterStats = Object.values(dateHistory).map((dateCharacterChs) => {
+      const dateCharacterStats = dateCharacterChs.map((dateCharacterCh) =>
+        getStats(dateCharacterCh)
       );
       return accumulateStats(dateCharacterStats);
     });
