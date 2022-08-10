@@ -112,9 +112,10 @@ export function setHasError(ch) {
 }
 
 /**
- * Information extracted from a `CompositionHistory` object.
+ * Information extracted from one or more `CompositionHistory` object.
  * @typedef {Object} CompositionHistoryStats
- * @property {boolean} compositionError whether any composition error happened
+ * @property {number} totalComposition number of character compositions
+ * @property {number} errorComposition number of character compositions that involved at least one error
  * @property {number} totalTime time used for all key presses
  * @property {number} effectiveTime time used for effective key presses
  * @property {Object.<string, number[]>} keysTimes time used to type each key
@@ -131,7 +132,8 @@ export function getStats(ch) {
   const keys = [...ch.k];
 
   const stats = {
-    compositionError: ch.e,
+    totalComposition: 1,
+    errorComposition: ch.e ? 1 : 0,
     totalTime: 0,
     effectiveTime: 0,
     keysTimes: {}
@@ -169,4 +171,28 @@ export function getStats(ch) {
   }
 
   return stats;
+}
+
+/**
+ * Accumulate one or more `CompositionHistoryStats` into one.
+ * @param {CompositionHistoryStats[]} statsArray
+ * @returns {CompositionHistoryStats}
+ */
+export function accumulateStats(statsArray) {
+  return Object.values(statsArray).reduce(
+    (acc, stats) => {
+      acc.totalComposition += stats.totalComposition;
+      acc.errorComposition += stats.errorComposition;
+      acc.totalTime += stats.totalTime;
+      acc.effectiveTime += stats.effectiveTime;
+      Object.keys(stats.keysTimes).forEach((key) => {
+        if (acc.keysTimes[key] == null) {
+          acc.keysTimes[key] = [];
+        }
+        acc.keysTimes[key].push(...stats.keysTimes[key]);
+      });
+      return acc;
+    },
+    { totalComposition: 0, errorComposition: 0, totalTime: 0, effectiveTime: 0, keysTimes: {} }
+  );
 }

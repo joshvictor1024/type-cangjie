@@ -1,27 +1,12 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import "./Stats.css";
 import { radicalKeysToRadicals } from "../../lib/typing/key";
-import { getStats } from "../../lib/typing/compositionHistory";
+import { getStats, accumulateStats } from "../../lib/typing/compositionHistory";
 
-function accumulateStats(statsArray) {
-  return Object.values(statsArray).reduce(
-    (acc, stats) => {
-      acc.totalComposition++;
-      acc.errorComposition += stats.compositionError ? 1 : 0;
-      acc.totalTime += stats.totalTime;
-      acc.effectiveTime += stats.effectiveTime;
-      Object.keys(stats.keysTimes).forEach((key) => {
-        if (!acc.keysTimes[key]) {
-          acc.keysTimes[key] = [];
-        }
-        acc.keysTimes[key].push(...stats.keysTimes[key]);
-      });
-      return acc;
-    },
-    { totalComposition: 0, errorComposition: 0, totalTime: 0, effectiveTime: 0, keysTimes: {} }
-  );
-}
-
+/**
+ * @param {Object.<string, Object.<string, CompositionHistory>>} history
+ * @returns {Object.<string, CompositionHistoryStats>}
+ */
 function getDateStats(history) {
   const dates = Object.keys(history);
   return dates.reduce((acc, date) => {
@@ -37,10 +22,19 @@ function getDateStats(history) {
   }, {});
 }
 
+/**
+ * @param {Object.<string, CompositionHistoryStats>} dateStats
+ * @returns {CompositionHistoryStats}
+ */
 function getStatsAllDates(dateStats) {
   return accumulateStats(Object.values(dateStats));
 }
 
+/**
+ * @param {Object.<string, CompositionHistoryStats>} dateStats
+ * @param {string} selectedDate
+ * @returns {CompositionHistoryStats|null} return `null` if either `dateStats` or `selectedDate` is not ready
+ */
 function getSelectedStats(dateStats, selectedDate) {
   if (dateStats && selectedDate) {
     return selectedDate === "all" ? getStatsAllDates(dateStats) : dateStats[selectedDate];
@@ -153,8 +147,12 @@ function KeyStatsTable({ keysTimes }) {
   );
 }
 
-export default function Stats({historyRef}) {
-  const [renderedHistory, setRenderedHistory] = useState(historyRef.current);
+/**
+ * @param {Object} props 
+ * @param {Object.<string, Object.<string, CompositionHistory>>} props.history
+ */
+export default function Stats({ history }) {
+  const [renderedHistory, setRenderedHistory] = useState(history);
   const dateStatsRef = useRef();
   const sortedDatesRef = useRef();
   const [selectedDate, setSelectedDate] = useState(null);
@@ -162,8 +160,8 @@ export default function Stats({historyRef}) {
   useLayoutEffect(() => {
     dateStatsRef.current = getDateStats(renderedHistory);
     sortedDatesRef.current = Object.keys(dateStatsRef.current).sort((a, b) => (a < b ? 1 : -1));
-    const selectedDate = sortedDatesRef.current[0];
-    if (selectedDate) setSelectedDate(selectedDate);
+    const firstSortedDate = sortedDatesRef.current[0];
+    if (firstSortedDate) setSelectedDate(firstSortedDate);
   }, [renderedHistory]);
 
   function handleChange(e) {
@@ -177,7 +175,7 @@ export default function Stats({historyRef}) {
       <div className="Stats__toolbar">
         <button
           className="Stats__refresh"
-          onClick={() => setRenderedHistory({ ...historyRef.current })}
+          onClick={() => setRenderedHistory({ ...history })}
         >
           重新整理
         </button>

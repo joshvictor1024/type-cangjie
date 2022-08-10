@@ -72,7 +72,7 @@ function AppWithContext() {
       />
       <Dashboard
         keyboard={keyboard}
-        stats={<Stats historyRef={historyRef} />}
+        stats={<Stats history={historyRef.current} />}
         dateAndSettings={<DataAndSettings historyRef={historyRef} setHistory={setHistory} />}
       />
       <div className="Footer">
