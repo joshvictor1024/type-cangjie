@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useWordbanks } from "../contexts/useWordbanks";
 import { useActiveWordbanks } from "../contexts/useActiveWordbanks";
+import * as wq from "../lib/typing/wordQueue";
 
 const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
@@ -16,21 +17,7 @@ function getActiveWordbankList(activeWordbanks) {
 export default function usePractice({ setLookupCharacter }) {
   const { wordbanks } = useWordbanks();
   const { activeWordbanks } = useActiveWordbanks();
-  const [wordQueue, setWordQueue] = useState([]);
-  const [currentWordProgress, setCurrentWordProgress] = useState(null);
-  function newCurrentWordProgress() {
-    return {
-      hasWrongCharacter: false,
-      correctCharacterCount: 0
-    };
-  }
-
-  /**
-   * @return {string} character
-   */
-  function getCompositionTarget() {
-    return wordQueue[0][currentWordProgress.correctCharacterCount];
-  }
+  const [wordQueue, setWordQueue] = useState(wq.createWordQueue());
 
   /**
    * @param {Ime} ime
@@ -38,31 +25,13 @@ export default function usePractice({ setLookupCharacter }) {
    */
   function onComposition(ime, targetCharacter) {
     if (ime.hasComposerFailure === false) {
-      if (checkWordDone()) {
-        setWordQueue(wordQueue.slice(1));
-        setCurrentWordProgress(newCurrentWordProgress());
-      } else {
-        setCurrentWordProgress((c) => {
-          return {
-            hasWrongCharacter: false,
-            correctCharacterCount: c.correctCharacterCount + 1
-          };
-        });
-      }
+      const newWordQueue = wq.onCompositionSuccess(wordQueue);
+      setWordQueue({ ...newWordQueue });
     } else {
-      setCurrentWordProgress((c) => {
-        return {
-          hasWrongCharacter: true,
-          correctCharacterCount: c.correctCharacterCount
-        };
-      });
+      const newWordQueue = wq.onCompositionFailure(wordQueue);
+      setWordQueue({ ...newWordQueue });
       setLookupCharacter(targetCharacter);
     }
-  }
-
-  function checkWordDone() {
-    const w = wordQueue[0];
-    return currentWordProgress.correctCharacterCount + 1 === w.length;
   }
 
   function drawRandom(count) {
@@ -98,21 +67,26 @@ export default function usePractice({ setLookupCharacter }) {
     if (words === null) return;
     // TODO: add this back in
     // clearComposerKeys();
-    setWordQueue(words);
-    setCurrentWordProgress(newCurrentWordProgress());
+    const newWordQueue = wq.setWords(wordQueue, words);
+    setWordQueue({ ...newWordQueue });
   }, [wordbanks, activeWordbanks]);
   useEffect(() => {
     if (getActiveWordbankList(activeWordbanks).length === 0) return;
     setWordQueue((c) => {
-      if (c.length < WORD_QUEUE_MIN_WORDS) {
-        const words = drawRandom(WORD_QUEUE_MAX_WORDS - c.length);
+      if (wq.getLength(c) < WORD_QUEUE_MIN_WORDS) {
+        const words = drawRandom(WORD_QUEUE_MAX_WORDS - wq.getLength(c));
         if (words === null) return c;
-        //console.log(c, words);
-        return [...c, ...words];
+        const newWordQueue = wq.pushWords(wordQueue, words);
+        return { ...newWordQueue };
       }
       return c;
     });
   }, [wordQueue]);
 
-  return { wordQueue, currentWordProgress, getCompositionTarget, onComposition };
+  return {
+    wordQueue,
+    currentWordProgress: wordQueue.firstWordCharactersCorrect,
+    getCompositionTarget: () => wq.getCompositionTarget(wordQueue),
+    onComposition
+  };
 }

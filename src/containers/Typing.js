@@ -20,12 +20,12 @@ export default function Typing({
       title="點擊開始打字練習..."
     >
       <div className="WordQueue">
-        {wordQueue.length > 0
-          ? wordQueue.map((word, i) => (
+        {wordQueue.queue.length > 0
+          ? wordQueue.queue.map((word, i) => (
               <Word
                 key={i}
                 word={word}
-                progress={i === 0 ? currentWordProgress : null}
+                progress={i === 0 ? currentWordProgress : []}
                 setLookupCharacter={setLookupCharacter}
               />
             ))
