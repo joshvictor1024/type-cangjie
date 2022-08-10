@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import useIme from "./useIme";
 import { useWordbanks } from "../contexts/useWordbanks";
 import { useActiveWordbanks } from "../contexts/useActiveWordbanks";
 
@@ -10,6 +9,10 @@ function getActiveWordbankList(activeWordbanks) {
   return Object.keys(activeWordbanks).filter((wordbankName) => activeWordbanks[wordbankName]);
 }
 
+/**
+ * @param {Object} props
+ * @param {React.Dispatch<React.SetStateAction<string>>} props.setLookupCharacter
+ */
 export default function usePractice({ setLookupCharacter }) {
   const { wordbanks } = useWordbanks();
   const { activeWordbanks } = useActiveWordbanks();
@@ -22,11 +25,19 @@ export default function usePractice({ setLookupCharacter }) {
     };
   }
 
+  /**
+   * @return {string} character
+   */
   function getCompositionTarget() {
     return wordQueue[0][currentWordProgress.correctCharacterCount];
   }
-  function onComposition(success, character) {
-    if (success) {
+
+  /**
+   * @param {Ime} ime
+   * @param {string} targetCharacter
+   */
+  function onComposition(ime, targetCharacter) {
+    if (ime.hasComposerFailure === false) {
       if (checkWordDone()) {
         setWordQueue(wordQueue.slice(1));
         setCurrentWordProgress(newCurrentWordProgress());
@@ -45,10 +56,9 @@ export default function usePractice({ setLookupCharacter }) {
           correctCharacterCount: c.correctCharacterCount
         };
       });
-      setLookupCharacter(character);
+      setLookupCharacter(targetCharacter);
     }
   }
-  const { ime, enterKey, clearBuffer } = useIme({ getCompositionTarget, onComposition });
 
   function checkWordDone() {
     const w = wordQueue[0];
@@ -86,7 +96,8 @@ export default function usePractice({ setLookupCharacter }) {
     if (getActiveWordbankList(activeWordbanks).length === 0) return;
     const words = drawRandom(WORD_QUEUE_MAX_WORDS);
     if (words === null) return;
-    clearBuffer();
+    // TODO: add this back in
+    // clearComposerKeys();
     setWordQueue(words);
     setCurrentWordProgress(newCurrentWordProgress());
   }, [wordbanks, activeWordbanks]);
@@ -103,5 +114,5 @@ export default function usePractice({ setLookupCharacter }) {
     });
   }, [wordQueue]);
 
-  return { enterKey, wordQueue, currentWordProgress, ime };
+  return { wordQueue, currentWordProgress, getCompositionTarget, onComposition };
 }

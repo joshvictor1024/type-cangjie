@@ -1,21 +1,16 @@
 import { useState } from "react";
 import { useCangjie } from "../contexts/useCangjieDicts";
-import { useCompositionHistory } from "../contexts/useCharacterHistory";
 import { createIme } from "../lib/typing/ime";
 import * as compose from "../lib/typing/compose";
 
 /**
  *
- * @param {Function} getCompositionTarget Return character as a string. Return `null` if no target exists
- * @param {Function} onComposition (success, character)
+ * @param {Object} props
+ * @param {() => string|null} props.getCompositionTarget return `null` if no target exists
+ * @param {((ime: Ime, targetCharacter: string) => {})[]} props.onComposition runs after a `attemptComposition` run without error
  */
 export default function useIme({ getCompositionTarget, onComposition }) {
   const [ime, setIme] = useState(createIme());
-  const {
-    onKey: chOnKey,
-    onComposition: chOnComposition,
-    clearCurrentComposition: statsClearCurrent
-  } = useCompositionHistory();
 
   const { dicts } = useCangjie();
   /**
@@ -23,7 +18,7 @@ export default function useIme({ getCompositionTarget, onComposition }) {
    * @param {string} key [a-z|"Backspace"|"Space"]
    */
   function enterKey(key) {
-    chOnKey(key);
+    // chOnKey(key);
     if (key === "Backspace") {
       const newIme = compose.deleteComposerKey(ime);
       setIme({ ...newIme });
@@ -33,18 +28,18 @@ export default function useIme({ getCompositionTarget, onComposition }) {
         return;
       }
 
-      const char = getCompositionTarget();
-      const newIme = compose.attemptComposition(ime, char, dicts, "ms");
+      const targetCharacter = getCompositionTarget();
+      if (targetCharacter === null) {
+        console.log("getCompositionTarget is not ready, aborting composition");
+        return;
+      }
+
+      const newIme = compose.attemptComposition(ime, targetCharacter, dicts, "ms");
       if (newIme !== null) {
-        if (newIme.hasComposerFailure) {
-          console.log("composer failure");
-          onComposition(false, char);
-          chOnComposition(false, null, char);
-        } else {
-          console.log("composer success");
-          onComposition(true, char);
-          chOnComposition(true, newIme.lastSubmission[1], char);
-        }
+        onComposition.forEach((v) => v(newIme, targetCharacter));
+        console.log(
+          "useIme attemptComposition" + (newIme.hasComposerFailure ? "failure" : "success")
+        );
         setIme({ ...newIme });
       }
     } else {
@@ -55,11 +50,12 @@ export default function useIme({ getCompositionTarget, onComposition }) {
     }
   }
 
-  function clearBuffer() {
-    const newIme = compose.clearComposerKeys(ime);
-    setIme({ ...newIme });
-    statsClearCurrent();
-  }
+  // TODO: add this back in
+  // function clearComposerKeys() {
+  //   const newIme = compose.clearComposerKeys(ime);
+  //   setIme({ ...newIme });
+  //   statsClearCurrent();
+  // }
 
-  return { ime, enterKey, clearBuffer };
+  return { ime, enterKey /*, clearComposerKeys*/ };
 }

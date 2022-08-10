@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import "./Dashboard.css";
 import Wordbanks from "./Wordbanks";
-import Stats from "./Stats";
-import DataAndSettings from "./DataAndSettings";
 
 function Tab({ tab, activeTab, setActiveTab, title }) {
   return (
@@ -15,18 +13,18 @@ function Tab({ tab, activeTab, setActiveTab, title }) {
   );
 }
 
-export default function Dashboard({ Keyboard }) {
+export default function Dashboard({ keyboard, stats, dateAndSettings }) {
   const [activeTab, setActiveTab] = useState("wordbanks");
   const panel = (() => {
     switch (activeTab) {
       case "wordbanks":
         return <Wordbanks />;
       case "keyboard":
-        return <Keyboard />;
+        return keyboard;
       case "stats":
-        return <Stats />;
+        return stats;
       case "dataAndSettings":
-        return <DataAndSettings />;
+        return dateAndSettings;
       default:
         throw new Error("unknown activeTab");
     }

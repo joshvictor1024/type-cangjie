@@ -203,5 +203,5 @@ export default function useScreenKeyboard(enterKey) {
       </div>
     );
   }
-  return { Keyboard, setKey };
+  return { keyboard: <Keyboard />, setKey };
 }

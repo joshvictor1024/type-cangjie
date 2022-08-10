@@ -1,6 +1,5 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import "./Stats.css";
-import { useCompositionHistory } from "../../contexts/useCharacterHistory";
 import { radicalKeysToRadicals } from "../../lib/typing/key";
 import { getStats } from "../../lib/typing/compositionHistory";
 
@@ -154,8 +153,7 @@ function KeyStatsTable({ keysTimes }) {
   );
 }
 
-export default function Stats() {
-  const { historyRef } = useCompositionHistory();
+export default function Stats({historyRef}) {
   const [renderedHistory, setRenderedHistory] = useState(historyRef.current);
   const dateStatsRef = useRef();
   const sortedDatesRef = useRef();

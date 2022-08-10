@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { getIsoDate, validateIsoDate } from "../util/isoDate";
 import * as ch from "../lib/typing/compositionHistory";
@@ -65,15 +65,7 @@ function validateDatesHistory(obj) {
   }
 }
 
-const CompositionHistoryContext = createContext({
-  history: {},
-  setHistory: () => false,
-  onKey: () => {},
-  onComposition: () => {},
-  clearCurrentComposition: () => {}
-});
-
-function CompositionHistoryProvider(props) {
+export default function useCompositionHistory() {
   const { isAvailable, get: getHistory, set: setHistory } = useLocalStorage("history");
   const historyRef = useRef({});
   const currentCHRef = useRef(ch.createCompositionHistory());
@@ -98,24 +90,29 @@ function CompositionHistoryProvider(props) {
     lastKeyTimeRef.current = now;
     currentCHRef.current = ch.addKey(currentCHRef.current, key, dt);
   }
-  function onComposition(success, code, character) {
-    if (success) {
+
+  /**
+   * @param {Ime} ime
+   * @param {string} targetCharacter
+   */
+  function onComposition(ime, targetCharacter) {
+    if (ime.hasComposerFailure === false) {
       if (ch.hasIdle(currentCHRef.current, MAX_KEY_TIME)) {
         console.log("idle");
         currentCHRef.current = ch.createCompositionHistory();
         return;
       }
-      currentCHRef.current = ch.setCode(currentCHRef.current, code);
+      currentCHRef.current = ch.setCode(currentCHRef.current, ime.lastSubmission[1]);
 
       const isoDate = getIsoDate();
       if (!historyRef.current[isoDate]) {
         historyRef.current[isoDate] = {};
       }
       const todayHistory = historyRef.current[isoDate];
-      if (!todayHistory[character]) {
-        todayHistory[character] = [];
+      if (!todayHistory[targetCharacter]) {
+        todayHistory[targetCharacter] = [];
       }
-      const characterHistories = todayHistory[character];
+      const characterHistories = todayHistory[targetCharacter];
       characterHistories.push(currentCHRef.current);
       if (characterHistories.length > MAX_HISTORY_PER_CHARACTER_PER_DAY) {
         characterHistories.shift();
@@ -129,9 +126,11 @@ function CompositionHistoryProvider(props) {
       currentCHRef.current = ch.setHasError(currentCHRef.current);
     }
   }
-  function clearCurrentComposition() {
-    currentCHRef.current = ch.createCompositionHistory();
-  }
+
+  // function onClearComposerKeys() {
+  //   currentCHRef.current = ch.createCompositionHistory();
+  // }
+
   function setHistoryExternal(obj) {
     const isValid = validateDatesHistory(obj);
     console.log(obj, isValid);
@@ -144,22 +143,11 @@ function CompositionHistoryProvider(props) {
     }
     return false;
   }
-  return (
-    <CompositionHistoryContext.Provider
-      value={{
-        historyRef,
-        setHistory: setHistoryExternal,
-        onKey,
-        onComposition,
-        clearCurrentComposition
-      }}
-      {...props}
-    />
-  );
+  return {
+    historyRef,
+    setHistory: setHistoryExternal,
+    onKey,
+    onComposition
+    // onClearComposerKeys
+  };
 }
-
-function useCompositionHistory() {
-  return useContext(CompositionHistoryContext);
-}
-
-export { CompositionHistoryProvider, useCompositionHistory };

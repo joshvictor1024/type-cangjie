@@ -2,23 +2,24 @@ import React, { useState } from "react";
 import "./App.css";
 import Typing from "./Typing";
 import Dashboard from "./Dashboard/Dashboard";
+import Stats from "./Dashboard/Stats";
+import DataAndSettings from "./Dashboard/DataAndSettings";
 import usePractice from "../hooks/usePractice";
+import useCompositionHistory from "../hooks/useCompositionHistory";
+import useIme from "../hooks/useIme";
 import Lookup from "./Lookup";
 import { toKey } from "../util/toInternalKey";
 import useScreenKeyboard from "../hooks/useScreenKeyboard";
 import { WordbanksProvider } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider } from "../contexts/useActiveWordbanks";
 import { CangjieDictsProvider } from "../contexts/useCangjieDicts";
-import { CompositionHistoryProvider } from "../contexts/useCharacterHistory";
 
 function App() {
   return (
     <WordbanksProvider>
       <ActiveWordbanksProvider>
         <CangjieDictsProvider>
-          <CompositionHistoryProvider>
-            <AppWithContext />
-          </CompositionHistoryProvider>
+          <AppWithContext />
         </CangjieDictsProvider>
       </ActiveWordbanksProvider>
     </WordbanksProvider>
@@ -27,10 +28,26 @@ function App() {
 
 function AppWithContext() {
   const [lookupCharacter, setLookupCharacter] = useState("");
-  const { enterKey, wordQueue, currentWordProgress, ime } = usePractice({
-    setLookupCharacter: setLookupCharacter
+
+  const {
+    wordQueue,
+    currentWordProgress,
+    getCompositionTarget,
+    onComposition: practiceOnComposition
+  } = usePractice({ setLookupCharacter });
+  const {
+    historyRef,
+    setHistory,
+    onKey: chOnKey,
+    onComposition: chOnComposition
+  } = useCompositionHistory();
+
+  const { ime, enterKey: imeEnterKey } = useIme({
+    getCompositionTarget,
+    onComposition: [practiceOnComposition, chOnComposition]
   });
-  const { Keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(enterKey);
+
+  const { keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(imeEnterKey);
 
   return (
     <div className="App">
@@ -42,7 +59,8 @@ function AppWithContext() {
         handleKeyDown={(e) => {
           const k = toKey(e.code);
           if (k === null) return;
-          enterKey(k);
+          chOnKey(k);
+          imeEnterKey(k);
           setScreenKeyboardKey(true, k);
         }}
         handleKeyUp={(e) => {
@@ -52,7 +70,11 @@ function AppWithContext() {
         }}
         setLookupCharacter={setLookupCharacter}
       />
-      <Dashboard Keyboard={Keyboard} />
+      <Dashboard
+        keyboard={keyboard}
+        stats={<Stats historyRef={historyRef} />}
+        dateAndSettings={<DataAndSettings historyRef={historyRef} setHistory={setHistory} />}
+      />
       <div className="Footer">
         <a href="https://github.com/joshvictor1024/type-cangjie">
           <svg className="Footer__github" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
