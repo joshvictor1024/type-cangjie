@@ -1,21 +1,58 @@
 import { useState, useEffect } from "react";
-import { useWordbanks } from "../contexts/useWordbanks";
 import { useActiveWordbanks } from "../contexts/useActiveWordbanks";
 import * as wq from "../lib/typing/wordQueue";
 
 const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
 
+/**
+ * @param {Object.<string, boolean>} activeWordbanks
+ * @returns {string[]}
+ */
 function getActiveWordbankList(activeWordbanks) {
   return Object.keys(activeWordbanks).filter((wordbankName) => activeWordbanks[wordbankName]);
 }
 
 /**
+ * @param {string[]} activeWordbankNames
+ * @param {Wordbank[]} wordbanks
+ * @returns {string|null} return `null` if no wordbanks are active
+ */
+function getActiveWords(activeWordbankNames, wordbanks) {
+  const activeWordbanks = activeWordbankNames
+    .map((wordbankName) => wordbanks.find((wb) => wb.name === wordbankName))
+    .filter((wb) => wb && wb.words);
+  //console.log(awb);
+  if (activeWordbanks.length === 0) return null;
+  return activeWordbanks.reduce((acc, cur) => {
+    return acc.concat(cur.words);
+  }, []);
+}
+
+/**
+ * @param {number} count draw this number of words, or until `words` run out
+ * @param {string[]|null} words this array is modified within the function. pass in a copy if necessary.
+ * @returns {string[]|null} if `words` is `null` then `null` is returned
+ */
+function drawRandom(count, words) {
+  console.log("draw");
+  if (words === null) {
+    return null;
+  }
+  const result = [];
+  while (result.length < count && words.length > 0) {
+    const r = Math.floor(Math.random() * words.length);
+    result.push(words[r]);
+  }
+  return result;
+}
+
+/**
  * @param {Object} props
+ * @param {Wordbank[]} props.wordbanks
  * @param {React.Dispatch<React.SetStateAction<string>>} props.setLookupCharacter
  */
-export default function usePractice({ setLookupCharacter }) {
-  const { wordbanks } = useWordbanks();
+export default function usePractice({ wordbanks, setLookupCharacter }) {
   const { activeWordbanks } = useActiveWordbanks();
   const [wordQueue, setWordQueue] = useState(wq.createWordQueue());
 
@@ -34,54 +71,39 @@ export default function usePractice({ setLookupCharacter }) {
     }
   }
 
-  function drawRandom(count) {
-    console.log("draw");
-    const awbl = getActiveWordbankList(activeWordbanks);
-    const awb = awbl
-      .map((wordbankName) => wordbanks.find((wb) => wb.name === wordbankName))
-      .filter((wb) => wb && wb.words);
-    //console.log(awb);
-    if (awb.length === 0) return null;
-
-    const cumulativeLengths = [0]; // from [0]:0 to [aws.length]:sum
-    for (let i = 0; i < awb.length; i++) {
-      cumulativeLengths[i + 1] = cumulativeLengths[i] + awb[i].words.length;
-    }
-
-    const result = [];
-    for (let i = 0; i < count; i++) {
-      const r = Math.floor(Math.random() * cumulativeLengths[cumulativeLengths.length - 1]);
-      for (let j = 0; j < awbl.length; j++) {
-        if (r < cumulativeLengths[j + 1]) {
-          result.push(awb[j].words[r - cumulativeLengths[j]]);
-          break;
-        }
-      }
-    }
-    //console.log(result);
-    return result;
-  }
+  // Make sure wordQueue is re-filled when `activeWordbanks` change.
   useEffect(() => {
     if (getActiveWordbankList(activeWordbanks).length === 0) return;
-    const words = drawRandom(WORD_QUEUE_MAX_WORDS);
-    if (words === null) return;
     // TODO: add this back in
     // clearComposerKeys();
-    const newWordQueue = wq.setWords(wordQueue, words);
-    setWordQueue({ ...newWordQueue });
+    setWordQueue((c) => {
+      const words = drawRandom(
+        WORD_QUEUE_MAX_WORDS,
+        getActiveWords(getActiveWordbankList(activeWordbanks), wordbanks)
+      );
+      if (words === null) return c;
+
+      const newWordQueue = wq.setWords(c, words);
+      return { ...newWordQueue };
+    });
   }, [wordbanks, activeWordbanks]);
+
+  // Make sure wordQueue is filled above `WORD_QUEUE_MIN_WORDS`.
   useEffect(() => {
     if (getActiveWordbankList(activeWordbanks).length === 0) return;
     setWordQueue((c) => {
       if (wq.getLength(c) < WORD_QUEUE_MIN_WORDS) {
-        const words = drawRandom(WORD_QUEUE_MAX_WORDS - wq.getLength(c));
+        const words = drawRandom(
+          WORD_QUEUE_MAX_WORDS - wq.getLength(c),
+          getActiveWords(getActiveWordbankList(activeWordbanks), wordbanks)
+        );
         if (words === null) return c;
         const newWordQueue = wq.pushWords(wordQueue, words);
         return { ...newWordQueue };
       }
       return c;
     });
-  }, [wordQueue]);
+  }, [wordQueue, wordbanks, activeWordbanks]);
 
   return {
     wordQueue,

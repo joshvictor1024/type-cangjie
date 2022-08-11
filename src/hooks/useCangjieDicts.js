@@ -1,24 +1,15 @@
 import { useState, useEffect } from "react";
+import { fetchJSON } from "../util/fetch";
 
 export default function useCangjieDicts() {
   const [dicts, setDicts] = useState(null);
 
   useEffect(() => {
     (async () => {
-      async function loadDictionary(dictionaryName) {
-        try {
-          const res = await fetch(`cangjie/dictionary/${dictionaryName}.json`);
-          const json = await res.json();
-          return json;
-        } catch (e) {
-          console.error(e);
-        }
-        return null;
-      }
-      const cj3Dictonary = await loadDictionary("3");
-      const cj5Dictonary = await loadDictionary("5");
-      const cj5xDictonary = await loadDictionary("5x");
-      const cjmsDictonary = await loadDictionary("ms");
+      const cj3Dictonary = await fetchJSON("cangjie/dictionary/3.json");
+      const cj5Dictonary = await fetchJSON("cangjie/dictionary/5.json");
+      const cj5xDictonary = await fetchJSON("cangjie/dictionary/5x.json");
+      const cjmsDictonary = await fetchJSON("cangjie/dictionary/ms.json");
       if (!(cj3Dictonary && cj5Dictonary && cj5xDictonary && cjmsDictonary)) {
         return;
       }

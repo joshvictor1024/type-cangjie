@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./Wordbanks.css";
-import { useWordbanks } from "../../contexts/useWordbanks";
 import { useActiveWordbanks } from "../../contexts/useActiveWordbanks";
 
 function isObject(obj) {
@@ -23,8 +22,11 @@ function doPropertiesMatch(obj1, obj2) {
   return true;
 }
 
-export default function Wordbanks() {
-  const { wordbanks } = useWordbanks();
+/**
+ * @param {Object} props
+ * @param {Wordbank[]} props.wordbanks
+ */
+export default function Wordbanks({ wordbanks }) {
   const { activeWordbanks, setActiveWordbank } = useActiveWordbanks();
   const [renderedWordbanks, setRenderedWordbanks] = useState([]);
 
@@ -32,7 +34,7 @@ export default function Wordbanks() {
     if (!doPropertiesMatch(renderedWordbanks, wordbanks)) {
       setRenderedWordbanks(wordbanks);
     }
-  }, [wordbanks]);
+  }, [renderedWordbanks, wordbanks]);
 
   function changeActiveWordbank(wordbankName, checked) {
     setActiveWordbank(wordbankName, checked);
@@ -51,7 +53,9 @@ export default function Wordbanks() {
                   checked={activeWordbanks[wordbank.name]}
                   onChange={(e) => changeActiveWordbank(wordbank.name, e.target.checked)}
                 />
-              ) : " 載入中..."}
+              ) : (
+                " 載入中..."
+              )}
             </label>
           </div>
         ))}

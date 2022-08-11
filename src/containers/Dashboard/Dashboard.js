@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import "./Dashboard.css";
-import Wordbanks from "./Wordbanks";
 
 function Tab({ tab, activeTab, setActiveTab, title }) {
   return (
@@ -13,12 +12,12 @@ function Tab({ tab, activeTab, setActiveTab, title }) {
   );
 }
 
-export default function Dashboard({ keyboard, stats, dateAndSettings }) {
+export default function Dashboard({ wordbanks, keyboard, stats, dateAndSettings }) {
   const [activeTab, setActiveTab] = useState("wordbanks");
   const panel = (() => {
     switch (activeTab) {
       case "wordbanks":
-        return <Wordbanks />;
+        return wordbanks;
       case "keyboard":
         return keyboard;
       case "stats":
