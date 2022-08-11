@@ -1,11 +1,9 @@
 import React from "react";
 import "./Lookup.css";
-import { useCangjie } from "../contexts/useCangjieDicts";
 import { radicalKeysToRadicals } from "../lib/typing/key";
 import { reverseLookup } from "../lib/typing/compose";
 
-export default function Lookup({ character, setCharacter }) {
-  const { dicts } = useCangjie();
+export default function Lookup({ dicts, character, setCharacter }) {
 
   const cj3Code = (reverseLookup(character, dicts, "3") ?? [""])[0];
   const cj5Code = (reverseLookup(character, dicts, "5") ?? [""])[0];

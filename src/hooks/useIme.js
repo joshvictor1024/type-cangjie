@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useCangjie } from "../contexts/useCangjieDicts";
 import { createIme } from "../lib/typing/ime";
 import * as compose from "../lib/typing/compose";
 
@@ -9,10 +8,9 @@ import * as compose from "../lib/typing/compose";
  * @param {() => string|null} props.getCompositionTarget return `null` if no target exists
  * @param {((ime: Ime, targetCharacter: string) => {})[]} props.onComposition runs after a `attemptComposition` run without error
  */
-export default function useIme({ getCompositionTarget, onComposition }) {
+export default function useIme({ dicts, getCompositionTarget, onComposition }) {
   const [ime, setIme] = useState(createIme());
 
-  const { dicts } = useCangjie();
   /**
    *
    * @param {string} key [a-z|"Backspace"|"Space"]

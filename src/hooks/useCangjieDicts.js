@@ -1,11 +1,7 @@
-import { createContext, useContext,useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-const CangjieContext = createContext({
-  dicts: null
-});
-
-function CangjieDictsProvider(props) {
-  const [dicts, setDicts] = useState(null)
+export default function useCangjieDicts() {
+  const [dicts, setDicts] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -26,21 +22,15 @@ function CangjieDictsProvider(props) {
       if (!(cj3Dictonary && cj5Dictonary && cj5xDictonary && cjmsDictonary)) {
         return;
       }
-      
+
       const newDicts = {};
       newDicts.dict3 = { ...cj5Dictonary, ...cj3Dictonary }; // overwrite former with latter
       newDicts.dict5 = { ...cj5Dictonary, ...cj5xDictonary };
-      newDicts.dict5x = {...cj5xDictonary};
+      newDicts.dict5x = { ...cj5xDictonary };
       newDicts.dictMs = { ...cj5Dictonary, ...cj3Dictonary, ...cjmsDictonary }; // overwrite former with latter
       setDicts(newDicts);
     })();
   }, []);
 
-  return <CangjieContext.Provider value={{ dicts }} {...props} />;
+  return dicts;
 }
-
-function useCangjie() {
-  return useContext(CangjieContext);
-}
-
-export { CangjieDictsProvider, useCangjie };

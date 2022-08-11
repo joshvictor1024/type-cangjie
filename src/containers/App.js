@@ -4,6 +4,7 @@ import Typing from "./Typing";
 import Dashboard from "./Dashboard/Dashboard";
 import Stats from "./Dashboard/Stats";
 import DataAndSettings from "./Dashboard/DataAndSettings";
+import useCangjieDicts from "../hooks/useCangjieDicts";
 import usePractice from "../hooks/usePractice";
 import useCompositionHistory from "../hooks/useCompositionHistory";
 import useIme from "../hooks/useIme";
@@ -12,21 +13,20 @@ import { toKey } from "../util/toInternalKey";
 import useScreenKeyboard from "../hooks/useScreenKeyboard";
 import { WordbanksProvider } from "../contexts/useWordbanks";
 import { ActiveWordbanksProvider } from "../contexts/useActiveWordbanks";
-import { CangjieDictsProvider } from "../contexts/useCangjieDicts";
 
 function App() {
   return (
     <WordbanksProvider>
       <ActiveWordbanksProvider>
-        <CangjieDictsProvider>
-          <AppWithContext />
-        </CangjieDictsProvider>
+        <AppWithContext />
       </ActiveWordbanksProvider>
     </WordbanksProvider>
   );
 }
 
 function AppWithContext() {
+  const cangjieDicts = useCangjieDicts();
+
   const [lookupCharacter, setLookupCharacter] = useState("");
 
   const {
@@ -43,6 +43,7 @@ function AppWithContext() {
   } = useCompositionHistory();
 
   const { ime, enterKey: imeEnterKey } = useIme({
+    dicts: cangjieDicts,
     getCompositionTarget,
     onComposition: [practiceOnComposition, chOnComposition]
   });
@@ -51,7 +52,7 @@ function AppWithContext() {
 
   return (
     <div className="App">
-      <Lookup character={lookupCharacter} setCharacter={setLookupCharacter} />
+      <Lookup dicts={cangjieDicts} character={lookupCharacter} setCharacter={setLookupCharacter} />
       <Typing
         wordQueue={wordQueue}
         currentWordProgress={currentWordProgress}
