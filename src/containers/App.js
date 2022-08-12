@@ -5,6 +5,7 @@ import Dashboard from "./Dashboard/Dashboard";
 import Stats from "./Dashboard/Stats";
 import Wordbanks from "./Dashboard/Wordbanks";
 import DataAndSettings from "./Dashboard/DataAndSettings";
+import useWordbankActive from "../hooks/useWordbankActive";
 import useCangjieDicts from "../hooks/useCangjieDicts";
 import useWordbanks from "../hooks/useWordbanks";
 import usePractice from "../hooks/usePractice";
@@ -13,18 +14,14 @@ import useIme from "../hooks/useIme";
 import Lookup from "./Lookup";
 import { toKey } from "../util/toInternalKey";
 import useScreenKeyboard from "../hooks/useScreenKeyboard";
-import { ActiveWordbanksProvider } from "../contexts/useActiveWordbanks";
 
 function App() {
-  return (
-    <ActiveWordbanksProvider>
-      <AppWithContext />
-    </ActiveWordbanksProvider>
-  );
+  return <AppWithContext />;
 }
 
 function AppWithContext() {
   const sections = useWordbanks();
+  const { wordbankActive, setWordbankActive } = useWordbankActive();
   const cangjieDicts = useCangjieDicts();
 
   const [lookupCharacter, setLookupCharacter] = useState("");
@@ -34,7 +31,7 @@ function AppWithContext() {
     currentWordProgress,
     getCompositionTarget,
     onComposition: practiceOnComposition
-  } = usePractice({ sections, setLookupCharacter });
+  } = usePractice({ sections, wordbankActive, setLookupCharacter });
   const {
     historyRef,
     setHistory,
@@ -72,7 +69,7 @@ function AppWithContext() {
         setLookupCharacter={setLookupCharacter}
       />
       <Dashboard
-        wordbanks={<Wordbanks sections={sections}/>}
+        wordbanks={<Wordbanks sections={sections} wordbankActive={wordbankActive} setWordbankActive={setWordbankActive} />}
         keyboard={keyboard}
         stats={<Stats history={historyRef.current} />}
         dateAndSettings={<DataAndSettings historyRef={historyRef} setHistory={setHistory} />}

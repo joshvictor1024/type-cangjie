@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import "./Wordbanks.css";
-import { useActiveWordbanks } from "../../contexts/useActiveWordbanks";
 
 function doItemsFieldMatch(arr1, arr2, fieldName) {
   if (arr1.length !== arr2.length) {
@@ -17,9 +16,10 @@ function doItemsFieldMatch(arr1, arr2, fieldName) {
 /**
  * @param {Object} props
  * @param {Section[]} props.sections
+ * @param {Object.<string, boolean>} props.wordbankActive
+ * @param {(wordbankName: string, value: boolean) => {}} props.setWordbankActive
  */
-export default function Wordbanks({ sections }) {
-  const { activeWordbanks, setActiveWordbank } = useActiveWordbanks();
+export default function Wordbanks({ sections, wordbankActive, setWordbankActive }) {
   const [renderedSections, setRenderedSections] = useState([]);
 
   useEffect(() => {
@@ -34,14 +34,14 @@ export default function Wordbanks({ sections }) {
   }, [renderedSections, sections]);
 
   function changeActiveWordbank(wordbankName, checked) {
-    setActiveWordbank(wordbankName, checked);
+    setWordbankActive(wordbankName, checked);
     return;
   }
   return (
     <div className="Wordbanks">
       <div className="column">
         {renderedSections.map((section) => (
-          <section key={section.name} className="Wordbanks__section column" >
+          <section key={section.name} className="Wordbanks__section column">
             <span>{section.displayName}</span>
             {section.wordbanks.map((wordbank) => (
               <div key={wordbank.name} className="Wordbanks__item">
@@ -50,7 +50,7 @@ export default function Wordbanks({ sections }) {
                   {wordbank.words ? (
                     <input
                       type="checkbox"
-                      checked={activeWordbanks[wordbank.name]}
+                      checked={wordbankActive[wordbank.name] ? true : false}
                       onChange={(e) => changeActiveWordbank(wordbank.name, e.target.checked)}
                     />
                   ) : (

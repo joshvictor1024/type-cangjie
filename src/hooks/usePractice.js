@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useActiveWordbanks } from "../contexts/useActiveWordbanks";
 import * as wq from "../lib/typing/wordQueue";
 
 const WORD_QUEUE_MIN_WORDS = 10;
@@ -17,11 +16,11 @@ function toWordbanks(sections) {
 }
 
 /**
- * @param {Object.<string, boolean>} activeWordbanks
+ * @param {Object.<string, boolean>} wordbankActive
  * @returns {string[]}
  */
-function getActiveWordbankList(activeWordbanks) {
-  return Object.keys(activeWordbanks).filter((wordbankName) => activeWordbanks[wordbankName]);
+function getActiveWordbankList(wordbankActive) {
+  return Object.keys(wordbankActive).filter((wordbankName) => wordbankActive[wordbankName]);
 }
 
 /**
@@ -46,7 +45,6 @@ function getActiveWords(activeWordbankNames, wordbanks) {
  * @returns {string[]|null} if `words` is `null` then `null` is returned
  */
 function drawRandom(count, words) {
-  console.log("draw");
   if (words === null) {
     return null;
   }
@@ -61,10 +59,10 @@ function drawRandom(count, words) {
 /**
  * @param {Object} props
  * @param {Section[]} props.sections
+ * @param {Object.<string, boolean>} props.wordbankActive
  * @param {React.Dispatch<React.SetStateAction<string>>} props.setLookupCharacter
  */
-export default function usePractice({ sections, setLookupCharacter }) {
-  const { activeWordbanks } = useActiveWordbanks();
+export default function usePractice({ sections, wordbankActive, setLookupCharacter }) {
   const [wordQueue, setWordQueue] = useState(wq.createWordQueue());
 
   /**
@@ -84,29 +82,29 @@ export default function usePractice({ sections, setLookupCharacter }) {
 
   // Make sure wordQueue is re-filled when `activeWordbanks` change.
   useEffect(() => {
-    if (getActiveWordbankList(activeWordbanks).length === 0) return;
+    if (getActiveWordbankList(wordbankActive).length === 0) return;
     // TODO: add this back in
     // clearComposerKeys();
     setWordQueue((c) => {
       const words = drawRandom(
         WORD_QUEUE_MAX_WORDS,
-        getActiveWords(getActiveWordbankList(activeWordbanks), toWordbanks(sections))
+        getActiveWords(getActiveWordbankList(wordbankActive), toWordbanks(sections))
       );
       if (words === null) return c;
 
       const newWordQueue = wq.setWords(c, words);
       return { ...newWordQueue };
     });
-  }, [sections, activeWordbanks]);
+  }, [sections, wordbankActive]);
 
   // Make sure wordQueue is filled above `WORD_QUEUE_MIN_WORDS`.
   useEffect(() => {
-    if (getActiveWordbankList(activeWordbanks).length === 0) return;
+    if (getActiveWordbankList(wordbankActive).length === 0) return;
     setWordQueue((c) => {
       if (wq.getLength(c) < WORD_QUEUE_MIN_WORDS) {
         const words = drawRandom(
           WORD_QUEUE_MAX_WORDS - wq.getLength(c),
-          getActiveWords(getActiveWordbankList(activeWordbanks), toWordbanks(sections))
+          getActiveWords(getActiveWordbankList(wordbankActive), toWordbanks(sections))
         );
         if (words === null) return c;
         const newWordQueue = wq.pushWords(wordQueue, words);
@@ -114,7 +112,7 @@ export default function usePractice({ sections, setLookupCharacter }) {
       }
       return c;
     });
-  }, [wordQueue, sections, activeWordbanks]);
+  }, [wordQueue, sections, wordbankActive]);
 
   return {
     wordQueue,
