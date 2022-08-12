@@ -11,11 +11,12 @@
   width: 20rem;
   overflow-x: hidden;
 }
+.Word {
+  display: flex;
+  flex-direction: row;
+}
 .Character {
   cursor: pointer;
-}
-.Character--ready {
-  color: black;
 }
 .Character--correct {
   color: gray;

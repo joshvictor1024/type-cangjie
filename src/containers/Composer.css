@@ -1,4 +1,8 @@
 .Composer {
+  display: flex;
+  flex-direction: row;
+}
+.Composer__radicals {
   box-sizing: content-box;
   width: 10rem;
   border: 1px solid black;

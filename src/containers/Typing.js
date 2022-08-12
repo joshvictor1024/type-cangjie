@@ -11,6 +11,9 @@ export default function Typing({
   handleKeyUp,
   setLookupCharacter
 }) {
+  const correctCount = currentWordProgress.reduce((acc, cur) => {
+    return cur ? acc + 1 : acc;
+  }, 0);
   return (
     <div
       className="Typing"
@@ -31,7 +34,7 @@ export default function Typing({
             ))
           : "選擇任一字庫以繼續..."}
       </div>
-      <Composer radicalKeys={composerKeys} />
+      <Composer radicalKeys={composerKeys} marginCount={correctCount} />
     </div>
   );
 }

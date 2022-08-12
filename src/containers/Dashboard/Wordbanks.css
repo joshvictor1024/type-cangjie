@@ -1,3 +1,6 @@
 .Wordbanks {
   padding: 1rem;
 }
+.Wordbanks__item {
+  margin-left: 1.5rem;
+}

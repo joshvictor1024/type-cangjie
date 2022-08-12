@@ -3,49 +3,48 @@ import useDebounceDependency from "../hooks/useDebounceDependency";
 import { fetchJSON, fetchText } from "../util/fetch";
 
 /** @typedef {{name: string, displayName: string, words: string[]}} Wordbank */
+/** @typedef {{name: string, displayName: string, wordbanks: Wordbank[]}} Section */
 
 /** @returns {Wordbank[]} */
 export default function useWordbanks() {
-  /** @type {[Wordbank, React.Dispatch<React.SetStateAction<Wordbank[]>>]} */
-  const [wordbanks, setWordbanks] = useState([]);
-  const debouncedWordbanks = useDebounceDependency(wordbanks, [], 100, { falling: true });
+  /** @type {[Section, React.Dispatch<React.SetStateAction<Section[]>>]} */
+  const [sections, setSections] = useState([]);
+  const debouncedSections = useDebounceDependency(sections, [], 100, { falling: true });
 
   useEffect(() => {
     (async () => {
-      // Load default wordbank manifests.
-      const defaults = await fetchJSON("wordbank/defaults.json");
-      if (defaults === null) {
+      // Load default wordbank manifest.
+      /** @type {Section[]} */
+      const manifest = await fetchJSON("wordbank/manifest.json");
+      if (manifest === null) {
         return;
       }
-      setWordbanks(
-        defaults.map((defaultWordbank) => {
-          return {
-            name: defaultWordbank.name,
-            displayName: defaultWordbank.displayName,
-            words: null
-          };
+      setSections(manifest);
+      
+      // Load wordbanks according to the manifest.
+      manifest.forEach((section) => {
+        // Load words according to the manifest.
+        section.wordbanks.forEach(async (wordbank) => {
+          const wordsString = await fetchText(`wordbank/${section.name}/${wordbank.name}.csv`);
+          if (wordsString === null) {
+            return;
+          }
+          const words = wordsString.split(",");
+          // If file is not found, returns HTML document, which contains "<".
+          if (words.find((word) => word.includes("<"))) {
+            return;
+          }
+          setSections((c) => {
+            const copy = [...c];
+            const sectionIndex = copy.findIndex((s) => s.name === section.name);
+            const wordbankIndex = copy[sectionIndex].wordbanks.findIndex((wb) => wb.name === wordbank.name);
+            copy[sectionIndex].wordbanks[wordbankIndex].words = words;
+            return copy;
+          });
         })
-      );
-      // Load words according to the manifests.
-      defaults.forEach(async (defaultWordbank) => {
-        const wordsString = await fetchText(`wordbank/words/${defaultWordbank.name}.csv`);
-        if (wordsString === null) {
-          return;
-        }
-        const words = wordsString.split(",");
-        // If file is not found, returns HTML document, which contains "<".
-        if (words.find((word) => word.includes("<"))) {
-          return;
-        }
-        setWordbanks((c) => {
-          const i = c.findIndex((wb) => wb.name === defaultWordbank.name);
-          const copy = [...c];
-          copy[i].words = words;
-          return copy;
-        });
-      });
+      })
     })();
   }, []);
 
-  return debouncedWordbanks;
+  return debouncedSections;
 }

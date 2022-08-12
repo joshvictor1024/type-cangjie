@@ -24,7 +24,7 @@ function App() {
 }
 
 function AppWithContext() {
-  const wordbanks = useWordbanks();
+  const sections = useWordbanks();
   const cangjieDicts = useCangjieDicts();
 
   const [lookupCharacter, setLookupCharacter] = useState("");
@@ -34,7 +34,7 @@ function AppWithContext() {
     currentWordProgress,
     getCompositionTarget,
     onComposition: practiceOnComposition
-  } = usePractice({ wordbanks, setLookupCharacter });
+  } = usePractice({ sections, setLookupCharacter });
   const {
     historyRef,
     setHistory,
@@ -72,7 +72,7 @@ function AppWithContext() {
         setLookupCharacter={setLookupCharacter}
       />
       <Dashboard
-        wordbanks={<Wordbanks wordbanks={wordbanks}/>}
+        wordbanks={<Wordbanks sections={sections}/>}
         keyboard={keyboard}
         stats={<Stats history={historyRef.current} />}
         dateAndSettings={<DataAndSettings historyRef={historyRef} setHistory={setHistory} />}

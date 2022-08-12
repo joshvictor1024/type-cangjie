@@ -3,7 +3,7 @@ import "./Typing.css";
 
 export default function Word({ word, progress, setLookupCharacter }) {
   function getClassBehavioral(i) {
-    if (i >= progress.length) return " Character--ready";
+    if (i >= progress.length) return "";
     return progress[i] ? " Character--correct" : " Character--wrong";
   }
   return (

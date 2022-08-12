@@ -1,0 +1,70 @@
+[
+  {
+    "name": "graded-character",
+    "displayName": "國教院三等七級字表",
+    "wordbanks": [
+      {
+        "name": "graded-character-l1",
+        "displayName": "國教院第一級漢字"
+      },
+      {
+        "name": "graded-character-l2",
+        "displayName": "國教院第二級漢字"
+      },
+      {
+        "name": "graded-character-l3",
+        "displayName": "國教院第三級漢字"
+      },
+      {
+        "name": "graded-character-l4",
+        "displayName": "國教院第四級漢字"
+      },
+      {
+        "name": "graded-character-l5",
+        "displayName": "國教院第五級漢字"
+      },
+      {
+        "name": "graded-character-l6",
+        "displayName": "國教院第六級漢字"
+      },
+      {
+        "name": "graded-character-l7",
+        "displayName": "國教院第七級漢字"
+      }
+    ]
+  },
+  {
+    "name": "graded-word",
+    "displayName": "國教院三等七級詞表",
+    "wordbanks": [
+      {
+        "name": "graded-word-l1",
+        "displayName": "國教院第一級詞彙"
+      },
+      {
+        "name": "graded-word-l2",
+        "displayName": "國教院第二級詞彙"
+      },
+      {
+        "name": "graded-word-l3",
+        "displayName": "國教院第三級詞彙"
+      },
+      {
+        "name": "graded-word-l4",
+        "displayName": "國教院第四級詞彙"
+      },
+      {
+        "name": "graded-word-l5",
+        "displayName": "國教院第五級詞彙"
+      },
+      {
+        "name": "graded-word-l6",
+        "displayName": "國教院第六級詞彙"
+      },
+      {
+        "name": "graded-word-l7",
+        "displayName": "國教院第七級詞彙"
+      }
+    ]
+  }
+]

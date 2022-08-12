@@ -2,20 +2,12 @@ import React, { useState, useEffect } from "react";
 import "./Wordbanks.css";
 import { useActiveWordbanks } from "../../contexts/useActiveWordbanks";
 
-function isObject(obj) {
-  return (obj !== null && typeof obj === "object") || typeof obj === "function";
-}
-
-function doPropertiesMatch(obj1, obj2) {
-  if (isObject(obj1) === false || isObject(obj2) === false) {
+function doItemsFieldMatch(arr1, arr2, fieldName) {
+  if (arr1.length !== arr2.length) {
     return false;
   }
-  const keys1 = Object.keys(obj1);
-  if (Object.keys(obj2).length !== keys1.length) {
-    return false;
-  }
-  for (let i = 0; i < keys1.length; i++) {
-    if (obj1[keys1[i]] !== obj2[keys1[i]]) {
+  for (let i = 0; i < arr1.length; i++) {
+    if (arr1[i][fieldName] !== arr2[i][fieldName]) {
       return false;
     }
   }
@@ -24,17 +16,22 @@ function doPropertiesMatch(obj1, obj2) {
 
 /**
  * @param {Object} props
- * @param {Wordbank[]} props.wordbanks
+ * @param {Section[]} props.sections
  */
-export default function Wordbanks({ wordbanks }) {
+export default function Wordbanks({ sections }) {
   const { activeWordbanks, setActiveWordbank } = useActiveWordbanks();
-  const [renderedWordbanks, setRenderedWordbanks] = useState([]);
+  const [renderedSections, setRenderedSections] = useState([]);
 
   useEffect(() => {
-    if (!doPropertiesMatch(renderedWordbanks, wordbanks)) {
-      setRenderedWordbanks(wordbanks);
+    if (!doItemsFieldMatch(renderedSections, sections, "displayName")) {
+      setRenderedSections(sections);
     }
-  }, [renderedWordbanks, wordbanks]);
+    for (let i = 0; i < renderedSections.length; i++) {
+      if (!doItemsFieldMatch(renderedSections[i].wordbanks, sections[i].wordbanks, "displayName")) {
+        setRenderedSections(sections);
+      }
+    }
+  }, [renderedSections, sections]);
 
   function changeActiveWordbank(wordbankName, checked) {
     setActiveWordbank(wordbankName, checked);
@@ -43,21 +40,26 @@ export default function Wordbanks({ wordbanks }) {
   return (
     <div className="Wordbanks">
       <div className="column">
-        {renderedWordbanks.map((wordbank) => (
-          <div className="Wordbanks__item" key={wordbank.name}>
-            <label>
-              {wordbank.displayName}
-              {wordbank.words ? (
-                <input
-                  type="checkbox"
-                  checked={activeWordbanks[wordbank.name]}
-                  onChange={(e) => changeActiveWordbank(wordbank.name, e.target.checked)}
-                />
-              ) : (
-                " 載入中..."
-              )}
-            </label>
-          </div>
+        {renderedSections.map((section) => (
+          <section key={section.name} className="Wordbanks__section column" >
+            <span>{section.displayName}</span>
+            {section.wordbanks.map((wordbank) => (
+              <div key={wordbank.name} className="Wordbanks__item">
+                <label>
+                  {wordbank.displayName}
+                  {wordbank.words ? (
+                    <input
+                      type="checkbox"
+                      checked={activeWordbanks[wordbank.name]}
+                      onChange={(e) => changeActiveWordbank(wordbank.name, e.target.checked)}
+                    />
+                  ) : (
+                    " 載入中..."
+                  )}
+                </label>
+              </div>
+            ))}
+          </section>
         ))}
       </div>
     </div>

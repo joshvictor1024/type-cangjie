@@ -6,6 +6,17 @@ const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
 
 /**
+ * @param {Section[]} sections
+ * @returns {Wordbank[]}
+ */
+function toWordbanks(sections) {
+  return sections.reduce((acc, section) => {
+    acc.push(...section.wordbanks);
+    return acc;
+  }, []);
+}
+
+/**
  * @param {Object.<string, boolean>} activeWordbanks
  * @returns {string[]}
  */
@@ -49,10 +60,10 @@ function drawRandom(count, words) {
 
 /**
  * @param {Object} props
- * @param {Wordbank[]} props.wordbanks
+ * @param {Section[]} props.sections
  * @param {React.Dispatch<React.SetStateAction<string>>} props.setLookupCharacter
  */
-export default function usePractice({ wordbanks, setLookupCharacter }) {
+export default function usePractice({ sections, setLookupCharacter }) {
   const { activeWordbanks } = useActiveWordbanks();
   const [wordQueue, setWordQueue] = useState(wq.createWordQueue());
 
@@ -79,14 +90,14 @@ export default function usePractice({ wordbanks, setLookupCharacter }) {
     setWordQueue((c) => {
       const words = drawRandom(
         WORD_QUEUE_MAX_WORDS,
-        getActiveWords(getActiveWordbankList(activeWordbanks), wordbanks)
+        getActiveWords(getActiveWordbankList(activeWordbanks), toWordbanks(sections))
       );
       if (words === null) return c;
 
       const newWordQueue = wq.setWords(c, words);
       return { ...newWordQueue };
     });
-  }, [wordbanks, activeWordbanks]);
+  }, [sections, activeWordbanks]);
 
   // Make sure wordQueue is filled above `WORD_QUEUE_MIN_WORDS`.
   useEffect(() => {
@@ -95,7 +106,7 @@ export default function usePractice({ wordbanks, setLookupCharacter }) {
       if (wq.getLength(c) < WORD_QUEUE_MIN_WORDS) {
         const words = drawRandom(
           WORD_QUEUE_MAX_WORDS - wq.getLength(c),
-          getActiveWords(getActiveWordbankList(activeWordbanks), wordbanks)
+          getActiveWords(getActiveWordbankList(activeWordbanks), toWordbanks(sections))
         );
         if (words === null) return c;
         const newWordQueue = wq.pushWords(wordQueue, words);
@@ -103,7 +114,7 @@ export default function usePractice({ wordbanks, setLookupCharacter }) {
       }
       return c;
     });
-  }, [wordQueue, wordbanks, activeWordbanks]);
+  }, [wordQueue, sections, activeWordbanks]);
 
   return {
     wordQueue,
