@@ -86,19 +86,24 @@ export function clearComposerKeys(ime) {
  * @param {string} character the character that you attempt to compose
  * @param {CangjieDicts|null} cangjieDicts if `null`, `attemptComposition` always fails
  * @param {CangjieVersion} cangjieVersion
- * @returns {Ime|null} returns `null` on error
+ * @returns {Ime|null} returns `null` if no composition happened
  */
 export function attemptComposition(ime, character, cangjieDicts, cangjieVersion) {
+  // Illegal argument.
   if (isCangjieVersion(cangjieVersion) === false) {
     return null;
   }
+  if (character.length !== 1) {
+    return null;
+  }
 
+  // No composition happened.
   ime = clearSubmission(ime);
   if (ime.composerKeys.length === 0) {
-    return ime;
+    return null;
   }
   if (ime.hasComposerFailure) {
-    return ime;
+    return null;
   }
 
   const matchingCodes = reverseLookup(character, cangjieDicts, cangjieVersion);
