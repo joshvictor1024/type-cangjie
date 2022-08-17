@@ -35,9 +35,6 @@ export default function useIme({ dicts, getCompositionTarget, onComposition }) {
       const newIme = compose.attemptComposition(ime, targetCharacter, dicts, "ms");
       if (newIme !== null) {
         onComposition.forEach((v) => v(newIme, targetCharacter));
-        console.log(
-          "useIme attemptComposition" + (newIme.hasComposerFailure ? "failure" : "success")
-        );
         setIme({ ...newIme });
       }
     } else {

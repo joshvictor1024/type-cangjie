@@ -62,6 +62,7 @@ export function addComposerKey(ime, key) {
  */
 export function deleteComposerKey(ime) {
   ime = clearSubmission(ime);
+  ime.hasComposerFailure = false;
   ime.composerKeys = ime.composerKeys.slice(0, ime.composerKeys.length - 1);
   return ime;
 }
@@ -107,7 +108,7 @@ export function attemptComposition(ime, character, cangjieDicts, cangjieVersion)
   }
 
   const matchingCodes = reverseLookup(character, cangjieDicts, cangjieVersion);
-  const code = ime.composerKeys.join("")
+  const code = ime.composerKeys.join("");
   if (matchingCodes === null || matchingCodes.includes(code) === false) {
     ime.hasComposerFailure = true;
     return ime;

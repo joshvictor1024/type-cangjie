@@ -78,7 +78,7 @@ function GeneralStatsTable({ chStats }) {
     [
       "輸入時間效率",
       "總輸入時間中，有效輸入時間的比例",
-      "(秒)",
+      "(%)",
       stats.getTimeEfficiency(chStats).toFixed(1)
     ],
     [

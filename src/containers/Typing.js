@@ -32,7 +32,7 @@ export default function Typing({
                 setLookupCharacter={setLookupCharacter}
               />
             ))
-          : "選擇任一字庫以繼續..."}
+          : "選擇任一詞庫以繼續..."}
       </div>
       <Composer radicalKeys={composerKeys} marginCount={correctCount} />
     </div>
