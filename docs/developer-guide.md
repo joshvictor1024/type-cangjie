@@ -17,6 +17,8 @@ Sometimes, `useEffect` effects may run twice. Disabling React strict mode may fi
 <App />,
 ```
 
+When you are ready to deploy, change `package.json` and `src/index.js` back if you've modified them. Run `yarn predeploy` then `yarn deploy`.
+
 ## Wordbank
 
 Common characters and words are from https://coct.naer.edu.tw/download/tech_report/.
