@@ -12,12 +12,14 @@ function Tab({ tab, activeTab, setActiveTab, title }) {
   );
 }
 
-export default function Dashboard({ wordbanks, keyboard, stats, dateAndSettings }) {
+export default function Dashboard({ wordbanks, graph, keyboard, stats, dateAndSettings}) {
   const [activeTab, setActiveTab] = useState("wordbanks");
   const panel = (() => {
     switch (activeTab) {
       case "wordbanks":
         return wordbanks;
+      case "graph":
+        return graph;
       case "keyboard":
         return keyboard;
       case "stats":
@@ -33,6 +35,7 @@ export default function Dashboard({ wordbanks, keyboard, stats, dateAndSettings 
       <div className="Dashboard__tabs">
         <div className="row">
           <Tab tab="wordbanks" activeTab={activeTab} setActiveTab={setActiveTab} title="選擇詞庫" />
+          <Tab tab="graph" activeTab={activeTab} setActiveTab={setActiveTab} title="即時圖表" />
           <Tab tab="keyboard" activeTab={activeTab} setActiveTab={setActiveTab} title="虛擬鍵盤" />
           <Tab tab="stats" activeTab={activeTab} setActiveTab={setActiveTab} title="統計資料" />
           <Tab tab="dataAndSettings" activeTab={activeTab} setActiveTab={setActiveTab} title="資料與設定" />

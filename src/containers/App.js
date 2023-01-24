@@ -5,11 +5,13 @@ import Dashboard from "./Dashboard/Dashboard";
 import Stats from "./Dashboard/Stats";
 import Wordbanks from "./Dashboard/Wordbanks";
 import DataAndSettings from "./Dashboard/DataAndSettings";
+import Graph from "./Dashboard/Graph";
 import useWordbankActive from "../hooks/useWordbankActive";
 import useCangjieDicts from "../hooks/useCangjieDicts";
 import useWordbanks from "../hooks/useWordbanks";
 import usePractice from "../hooks/usePractice";
 import useCompositionHistory from "../hooks/useCompositionHistory";
+import useGraph from "../hooks/useGraph";
 import useIme from "../hooks/useIme";
 import Lookup from "./Lookup";
 import { toKey } from "../util/toInternalKey";
@@ -38,11 +40,16 @@ function AppWithContext() {
     onKey: chOnKey,
     onComposition: chOnComposition
   } = useCompositionHistory();
+  const {
+    onKey: graphOnKey,
+    onComposition: graphOnComposition,
+    getRecentStats: graphGetRecentStats
+  } = useGraph();
 
   const { ime, enterKey: imeEnterKey } = useIme({
     dicts: cangjieDicts,
     getCompositionTarget,
-    onComposition: [practiceOnComposition, chOnComposition]
+    onComposition: [practiceOnComposition, chOnComposition, graphOnComposition]
   });
 
   const { keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(imeEnterKey);
@@ -58,6 +65,7 @@ function AppWithContext() {
           const k = toKey(e.code);
           if (k === null) return;
           chOnKey(k);
+          graphOnKey(k);
           imeEnterKey(k);
           setScreenKeyboardKey(true, k);
         }}
@@ -70,6 +78,7 @@ function AppWithContext() {
       />
       <Dashboard
         wordbanks={<Wordbanks sections={sections} wordbankActive={wordbankActive} setWordbankActive={setWordbankActive} />}
+        graph={<Graph getRecentStats={graphGetRecentStats} />}
         keyboard={keyboard}
         stats={<Stats history={historyRef.current} />}
         dateAndSettings={<DataAndSettings historyRef={historyRef} setHistory={setHistory} />}
