@@ -13,6 +13,20 @@
  */
 
 /**
+ * Create a default-valued CompositionHistoryStats
+ * @returns {CompositionHistoryStats}
+ */
+export function createCompositionHistoryStats() {
+  return {
+    totalComposition: 0,
+    errorComposition: 0,
+    totalTime: 0,
+    effectiveTime: 0,
+    keysTimes: {}
+  };
+}
+
+/**
  * Extract information from `ch`.
  * @param {CompositionHistory} ch
  * @returns {CompositionHistoryStats}
@@ -22,13 +36,9 @@ export function getStats(ch) {
   const codeArray = Array.from(ch.c);
   const keys = [...ch.k];
 
-  const stats = {
-    totalComposition: 1,
-    errorComposition: ch.e ? 1 : 0,
-    totalTime: 0,
-    effectiveTime: 0,
-    keysTimes: {}
-  };
+  const stats = createCompositionHistoryStats();
+  stats.totalComposition = 1;
+  stats.errorComposition = ch.e ? 1 : 0;
 
   // TODO: this algorithm is not correct
   // e.g. compose 說(yrcru) by typing "yrcruu":

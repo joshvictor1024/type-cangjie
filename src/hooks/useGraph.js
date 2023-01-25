@@ -13,7 +13,7 @@ import * as stats from "../lib/typing/stats.js";
 //   }
 // }
 
-const RECENT_CH_MAX_PERIOD = 60000; // ms
+const MAX_KEY_TIME = 1500;
 
 export default function useGraph() {
   const currentCHRef = useRef(ch.createCompositionHistory());
@@ -36,6 +36,11 @@ export default function useGraph() {
    */
   function onComposition(ime, _) {
     if (ime.hasComposerFailure === false) {
+      if (ch.hasIdle(currentCHRef.current, MAX_KEY_TIME)) {
+        console.log("idle");
+        currentCHRef.current = ch.createCompositionHistory();
+        return;
+      }
       currentCHRef.current = ch.setCode(currentCHRef.current, ime.lastSubmission[1]);
       currentCHRef.current.compositionTimestamp = Date.now();
 
@@ -46,8 +51,17 @@ export default function useGraph() {
     }
   }
 
-  function getRecentStats() {
-    recentCHRef.current = recentCHRef.current.filter((v) => Date.now() - v.compositionTimestamp < RECENT_CH_MAX_PERIOD);
+  /**
+   * Delete stats `maxAge` ms older than `Date.now()` 
+   * and accumulate the rest
+   * @param {number} maxAge
+   * @returns 
+   */
+  function getRecentStats(maxAge) {
+    recentCHRef.current = recentCHRef.current.filter((v) => Date.now() - v.compositionTimestamp < maxAge);
+    if (recentCHRef.current.length === 0) {
+      return stats.createCompositionHistoryStats();
+    }
     return stats.accumulateStats(recentCHRef.current.map((v) => stats.getStats(v)));
   }
 

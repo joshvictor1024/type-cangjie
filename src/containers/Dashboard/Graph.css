@@ -1,0 +1,48 @@
+.Graph {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.Graph button {
+  width: fit-content;
+}
+.Graph svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.Area {
+  fill: #d3d3d3;
+}
+.AreaOptimal {
+  fill: #b3b3b3;
+}
+.XLabel {
+  fill: black;
+}
+.YLabel {
+  fill: black;
+}
+.tick line {
+  stroke: #d3d3d3;
+}
+.Legend__background {
+  stroke: black;
+  fill: white;
+}
+.Legend__colorArea {
+  stroke: black;
+  fill: #d3d3d3;
+}
+.Legend__colorAreaOptimal {
+  stroke: black;
+  fill: #b3b3b3;
+}
+.Legend__labelArea {
+  alignment-baseline: baseline;
+  font-size: 12px;
+}
+.Legend__labelAreaOptimal {
+  alignment-baseline: baseline;
+  font-size: 12px;
+}
