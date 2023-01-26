@@ -1,32 +1,36 @@
 import { useEffect, useRef } from "react";
-import useLocalStorage from "../hooks/useLocalStorage";
+import useLocalStorage from "./useLocalStorage";
 import { getIsoDate, validateIsoDate } from "../util/isoDate";
-import * as ch from "../lib/typing/compositionHistory";
-
-// character history:
-// {
-//   isoDate: String: {
-//     character: String: [{
-//       code: String
-//       keys: [[key: String, time: Number]]
-//       hasError: Boolean
-//     }]
-//   }
-// }
+import * as typingHistory from "../lib/typing/history";
 
 /** @typedef {import('../lib/typing/ime.js').Ime} Ime */
-/** @typedef {import('../lib/typing/compositionHistory.js').CompositionHistory} CompositionHistory */
+/** @typedef {import('../lib/typing/history.js').HistoryEntry} HistoryEntry */
+
+/**
+ * `HistoryEntry` composing the character.
+ * @typedef {HistoryEntry[]} CharacterHistory
+ */
+
+/**
+ * `CharacterHistory` added in that date. Indexed by character.
+ * @typedef {Object.<string, CharacterHistory>} DateHistory
+ */
+
+/**
+ * Collection of `DateHistory`. Indexed by ISO date.
+ *  @typedef {Object.<string, DateHistory>} AllHistory
+ */
 
 const MAX_HISTORY_PER_CHARACTER_PER_DAY = 10;
 const MAX_KEY_TIME = 1500;
 
 /**
- * @param {CompositionHistory[]} obj
+ * @param {CharacterHistory} characterHistory
  */
-function validateChs(obj) {
+function validateCharacterHistory(characterHistory) {
   try {
     let flag = false;
-    obj.forEach((v) => (flag |= ch.validate(v, MAX_KEY_TIME) !== null));
+    characterHistory.forEach((v) => (flag |= typingHistory.validate(v, MAX_KEY_TIME) !== null));
     return !flag;
   } catch (e) {
     console.error(e);
@@ -35,13 +39,13 @@ function validateChs(obj) {
 }
 
 /**
- * @param {Object.<string, CompositionHistory[]>} obj
+ * @param {DateHistory} dateHistory
  */
-function validateCharactersChs(obj) {
+function validateDateHistory(dateHistory) {
   try {
     let flag = false;
 
-    Object.keys(obj).forEach((v) => {
+    Object.keys(dateHistory).forEach((v) => {
       flag |= typeof v !== "string";
       flag |= v.length !== 1;
     });
@@ -50,7 +54,7 @@ function validateCharactersChs(obj) {
       return false;
     }
 
-    Object.values(obj).forEach((v) => (flag |= !validateChs(v)));
+    Object.values(dateHistory).forEach((v) => (flag |= !validateCharacterHistory(v)));
     if (flag) return false;
 
     return true;
@@ -61,16 +65,16 @@ function validateCharactersChs(obj) {
 }
 
 /**
- * @param {Object.<string, Object.<string, CompositionHistory[]>>} obj
+ * @param {AllHistory} allHistory
  */
-function validateDatesHistory(obj) {
+function validateAllHistory(allHistory) {
   try {
     let flag = false;
 
-    Object.keys(obj).forEach((v) => (flag |= !validateIsoDate(v)));
+    Object.keys(allHistory).forEach((v) => (flag |= !validateIsoDate(v)));
     if (flag) return false;
 
-    Object.values(obj).forEach((v) => (flag |= !validateCharactersChs(v)));
+    Object.values(allHistory).forEach((v) => (flag |= !validateDateHistory(v)));
     if (flag) return false;
 
     return true;
@@ -79,10 +83,10 @@ function validateDatesHistory(obj) {
   }
 }
 
-export default function useCompositionHistory() {
+export default function useTypingHistory() {
   const { isAvailable, get: getHistory, set: setHistory } = useLocalStorage("history");
   const historyRef = useRef({});
-  const currentCHRef = useRef(ch.createCompositionHistory());
+  const currentHistoryEntryRef = useRef(typingHistory.createHistoryEntry());
   const lastKeyTimeRef = useRef(Date.now());
 
   useEffect(() => {
@@ -101,7 +105,7 @@ export default function useCompositionHistory() {
     const now = Date.now();
     const dt = now - lastKeyTimeRef.current;
     lastKeyTimeRef.current = now;
-    currentCHRef.current = ch.addKey(currentCHRef.current, key, dt);
+    currentHistoryEntryRef.current = typingHistory.addKey(currentHistoryEntryRef.current, key, dt);
   }
 
   /**
@@ -110,12 +114,12 @@ export default function useCompositionHistory() {
    */
   function onComposition(ime, targetCharacter) {
     if (ime.hasComposerFailure === false) {
-      if (ch.hasIdle(currentCHRef.current, MAX_KEY_TIME)) {
+      if (typingHistory.hasIdle(currentHistoryEntryRef.current, MAX_KEY_TIME)) {
         console.log("idle");
-        currentCHRef.current = ch.createCompositionHistory();
+        currentHistoryEntryRef.current = typingHistory.createHistoryEntry();
         return;
       }
-      currentCHRef.current = ch.setCode(currentCHRef.current, ime.lastSubmission[1]);
+      currentHistoryEntryRef.current = typingHistory.setCode(currentHistoryEntryRef.current, ime.lastSubmission[1]);
 
       const isoDate = getIsoDate();
       if (!historyRef.current[isoDate]) {
@@ -126,34 +130,34 @@ export default function useCompositionHistory() {
         todayHistory[targetCharacter] = [];
       }
       const characterHistories = todayHistory[targetCharacter];
-      characterHistories.push(currentCHRef.current);
+      characterHistories.push(currentHistoryEntryRef.current);
       if (characterHistories.length > MAX_HISTORY_PER_CHARACTER_PER_DAY) {
         characterHistories.shift();
       }
-      currentCHRef.current = ch.createCompositionHistory();
+      currentHistoryEntryRef.current = typingHistory.createHistoryEntry();
 
       if (isAvailable()) {
         setHistory(historyRef.current);
       }
     } else {
-      currentCHRef.current = ch.setHasError(currentCHRef.current);
+      currentHistoryEntryRef.current = typingHistory.setHasError(currentHistoryEntryRef.current);
     }
   }
 
   // function onClearComposerKeys() {
-  //   currentCHRef.current = ch.createCompositionHistory();
+  //   currentCHRef.current = ch.createHistoryEntry();
   // }
 
   /**
-   * @param {Object.<string, Object.<string, CompositionHistory[]>>} obj
+   * @param {AllHistory} allHistory
    */
-  function setHistoryExternal(obj) {
-    const isValid = validateDatesHistory(obj);
-    console.log(obj, isValid);
+  function setHistoryExternal(allHistory) {
+    const isValid = validateAllHistory(allHistory);
+    console.log(allHistory, isValid);
     if (isValid) {
-      historyRef.current = obj;
+      historyRef.current = allHistory;
       if (isAvailable()) {
-        setHistory(obj);
+        setHistory(allHistory);
       }
       return true;
     }

@@ -1,13 +1,13 @@
 import { useRef } from "react";
-import * as ch from "../lib/typing/compositionHistory";
+import * as typingHistory from "../lib/typing/history";
 import * as stats from "../lib/typing/stats.js";
 
 /** @typedef {import('../lib/typing/ime.js').Ime} Ime */
 
-const MAX_KEY_TIME = 1500;
+const KEY_IDLE_TIME_THRESHOLD = 1500; // ms
 
 export default function useGraph() {
-  const currentCHRef = useRef(ch.createCompositionHistory());
+  const currentCHRef = useRef(typingHistory.createHistoryEntry());
   const recentCHRef = useRef([]);
   const lastKeyTimeRef = useRef(Date.now());
 
@@ -19,7 +19,7 @@ export default function useGraph() {
     const now = Date.now();
     const dt = now - lastKeyTimeRef.current;
     lastKeyTimeRef.current = now;
-    currentCHRef.current = ch.addKey(currentCHRef.current, key, dt);
+    currentCHRef.current = typingHistory.addKey(currentCHRef.current, key, dt);
   }
 
   /**
@@ -27,18 +27,18 @@ export default function useGraph() {
    */
   function onComposition(ime, _) {
     if (ime.hasComposerFailure === false) {
-      if (ch.hasIdle(currentCHRef.current, MAX_KEY_TIME)) {
+      if (typingHistory.hasIdle(currentCHRef.current, KEY_IDLE_TIME_THRESHOLD)) {
         console.log("idle");
-        currentCHRef.current = ch.createCompositionHistory();
+        currentCHRef.current = typingHistory.createHistoryEntry();
         return;
       }
-      currentCHRef.current = ch.setCode(currentCHRef.current, ime.lastSubmission[1]);
+      currentCHRef.current = typingHistory.setCode(currentCHRef.current, ime.lastSubmission[1]);
       currentCHRef.current.compositionTimestamp = Date.now();
 
       recentCHRef.current.push(currentCHRef.current);
-      currentCHRef.current = ch.createCompositionHistory();
+      currentCHRef.current = typingHistory.createHistoryEntry();
     } else {
-      currentCHRef.current = ch.setHasError(currentCHRef.current);
+      currentCHRef.current = typingHistory.setHasError(currentCHRef.current);
     }
   }
 
@@ -50,13 +50,13 @@ export default function useGraph() {
   function getRecentStats(maxAge) {
     recentCHRef.current = recentCHRef.current.filter((v) => Date.now() - v.compositionTimestamp < maxAge);
     if (recentCHRef.current.length === 0) {
-      return stats.createCompositionHistoryStats();
+      return stats.createStats();
     }
     return stats.accumulateStats(recentCHRef.current.map((v) => stats.getStats(v)));
   }
 
   // function onClearComposerKeys() {
-  //   currentCHRef.current = ch.createCompositionHistory();
+  //   currentCHRef.current = ch.createHistoryEntry();
   // }
   return {
     onKey,

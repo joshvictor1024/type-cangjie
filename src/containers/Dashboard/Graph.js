@@ -10,11 +10,11 @@ const DATAPOINT_LENGTH = 60;
 // since interval of `setInterval` fluctuates.
 const DATAPOINT_MAX_AGE = (UPDATE_INTERVAL * 1000) * (DATAPOINT_LENGTH + 2); // ms
 
-/** @typedef {import('../../lib/typing/stats.js').CompositionHistoryStats} CompositionHistoryStats */
+/** @typedef {import('../../lib/typing/stats.js').Stats} Stats */
 
 /**
  * @param {Object} props
- * @param {(number) => CompositionHistoryStats} props.getRecentStats
+ * @param {(number) => Stats} props.getRecentStats
  */
 export default function Graph({getRecentStats}) {
   const [datapoints, setDatapoints] = useState([{cpm: 0, optimalCpm: 0, timestamp: Date.now()}]);

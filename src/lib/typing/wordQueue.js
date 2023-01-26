@@ -1,6 +1,6 @@
 /**
- * Functions in this module that return type `CompositionHistory` does not return a new object.
- * Beware when you use the `CompositionHistory` object with `useState()`.
+ * Functions in this module that return type `HistoryEntry` does not return a new object.
+ * Beware when you use the `HistoryEntry` object with `useState()`.
  * @module typing
  */
 

@@ -3,8 +3,9 @@
  */
 
 /**
- * Information extracted from one or more `CompositionHistory` object.
- * @typedef {Object} CompositionHistoryStats
+ * Information extracted from one or more `HistoryEntry` object.
+ * Time is in milliseconds.
+ * @typedef {Object} Stats
  * @property {number} totalComposition number of character compositions
  * @property {number} errorComposition number of character compositions that involved at least one error
  * @property {number} totalTime time used for all key presses
@@ -13,10 +14,10 @@
  */
 
 /**
- * Creates a default-valued `CompositionHistoryStats`.
- * @returns {CompositionHistoryStats}
+ * Creates a default-valued `Stats`.
+ * @returns {Stats}
  */
-export function createCompositionHistoryStats() {
+export function createStats() {
   return {
     totalComposition: 0,
     errorComposition: 0,
@@ -27,21 +28,21 @@ export function createCompositionHistoryStats() {
 }
 
 /**
- * Extracts information from `ch`.
- * @param {CompositionHistory} ch
- * @returns {CompositionHistoryStats}
+ * Extracts information from `he`.
+ * @param {HistoryEntry} he
+ * @returns {Stats}
  */
-export function getStats(ch) {
-  // Make copies so as not to modify `ch`.
-  const codeArray = Array.from(ch.c);
-  const keys = [...ch.k];
+export function getStats(he) {
+  // Make copies so as not to modify `he`.
+  const codeArray = Array.from(he.c);
+  const keys = [...he.k];
 
-  const stats = createCompositionHistoryStats();
+  const stats = createStats();
   stats.totalComposition = 1;
-  stats.errorComposition = ch.e ? 1 : 0;
+  stats.errorComposition = he.e ? 1 : 0;
 
   // TODO: this algorithm is not correct
-  // e.g. compose 說(yrcru) by typing "yrcruu":
+  // e.g. compose 說(yrcru) by typing "yrcruu ":
   // second last "u" is the effective key, yet last "u" is counted.
   //
   // Process from the end of `keys`.
@@ -79,9 +80,9 @@ export function getStats(ch) {
 }
 
 /**
- * Accumulates one or more `CompositionHistoryStats` into one.
- * @param {CompositionHistoryStats[]} statsArray
- * @returns {CompositionHistoryStats}
+ * Accumulates one or more `Stats` into one.
+ * @param {Stats[]} statsArray
+ * @returns {Stats}
  */
 export function accumulateStats(statsArray) {
   return Object.values(statsArray).reduce(
@@ -103,39 +104,36 @@ export function accumulateStats(statsArray) {
 }
 
 /**
- * In percents.
- * @param {CompositionHistoryStats} chStats
- * @returns {number}
+ * @param {Stats} stats
+ * @returns {number} Returns accuracy in percents.
  */
-export function getCompositionAccuracy(chStats) {
-  return ((chStats.totalComposition - chStats.errorComposition) * 100) / chStats.totalComposition;
+export function getCompositionAccuracy(stats) {
+  return ((stats.totalComposition - stats.errorComposition) * 100) / stats.totalComposition;
 }
 
 /**
- * In percents.
- * @param {CompositionHistoryStats} chStats
- * @returns {number}
+ * @param {Stats} stats
+ * @returns {number} Returns efficiency in percents.
  */
-export function getTimeEfficiency(chStats) {
-  return (chStats.effectiveTime / chStats.totalTime) * 100;
+export function getTimeEfficiency(stats) {
+  return (stats.effectiveTime / stats.totalTime) * 100;
 }
 
 /**
- * In characters per minute (cpm).
- * @param {CompositionHistoryStats} chStats
- * @returns {number}
+ * @param {Stats} stats
+ * @returns {number} Returns speed in characters per minute (cpm).
  */
-export function getOptimalAverageSpeed(chStats) {
+export function getOptimalAverageSpeed(stats) {
   return (
-    (chStats.totalComposition - chStats.errorComposition) / (chStats.effectiveTime / (1000 * 60))
+    (stats.totalComposition - stats.errorComposition) / (stats.effectiveTime / (1000 * 60))
   );
 }
 
 /**
  * In characters per minute (cpm).
- * @param {CompositionHistoryStats} chStats
+ * @param {Stats} stats
  * @returns {number}
  */
-export function getAverageSpeed(chStats) {
-  return chStats.totalComposition / (chStats.totalTime / (1000 * 60));
+export function getAverageSpeed(stats) {
+  return stats.totalComposition / (stats.totalTime / (1000 * 60));
 }

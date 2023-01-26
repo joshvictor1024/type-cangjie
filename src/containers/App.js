@@ -10,7 +10,7 @@ import useWordbankActive from "../hooks/useWordbankActive";
 import useCangjieDicts from "../hooks/useCangjieDicts";
 import useWordbanks from "../hooks/useWordbanks";
 import usePractice from "../hooks/usePractice";
-import useCompositionHistory from "../hooks/useCompositionHistory";
+import useTypingHistory from "../hooks/useTypingHistory";
 import useGraph from "../hooks/useGraph";
 import useIme from "../hooks/useIme";
 import Lookup from "./Lookup";
@@ -37,9 +37,9 @@ function AppWithContext() {
   const {
     historyRef,
     setHistory,
-    onKey: chOnKey,
-    onComposition: chOnComposition
-  } = useCompositionHistory();
+    onKey: thOnKey,
+    onComposition: thOnComposition
+  } = useTypingHistory();
   const {
     onKey: graphOnKey,
     onComposition: graphOnComposition,
@@ -49,7 +49,7 @@ function AppWithContext() {
   const { ime, enterKey: imeEnterKey } = useIme({
     dicts: cangjieDicts,
     getCompositionTarget,
-    onComposition: [practiceOnComposition, chOnComposition, graphOnComposition]
+    onComposition: [practiceOnComposition, thOnComposition, graphOnComposition]
   });
 
   const { keyboard, setKey: setScreenKeyboardKey } = useScreenKeyboard(imeEnterKey);
@@ -64,7 +64,7 @@ function AppWithContext() {
         handleKeyDown={(e) => {
           const k = toKey(e.code);
           if (k === null) return;
-          chOnKey(k);
+          thOnKey(k);
           graphOnKey(k);
           imeEnterKey(k);
           setScreenKeyboardKey(true, k);

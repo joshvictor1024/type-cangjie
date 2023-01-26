@@ -1,25 +1,25 @@
 /**
- * Functions in this module that return type `CompositionHistory` does not return a new object.
- * Beware when you use the `CompositionHistory` object with `useState()`.
+ * Functions in this module that return type `HistoryEntry` does not return a new object.
+ * Beware when you use the `HistoryEntry` object with `useState()`.
  * @module typing
  */
 
 import { isKey } from "./key.js";
 
 /**
- * Records the composition process of a character.
+ * Records a single composition process of a character.
  * Property names are shortened to save space when storing as JSON.
- * @typedef {Object} CompositionHistory
+ * @typedef {Object} HistoryEntry
  * @property {string} c the code used to compose the character
  * @property {[string, number][]} k the key typed and milliseconds elapsed since last key, in the order of typing
  * @property {boolean} e whether any composition error happened
  */
 
 /**
- * Creates a default-valued `CompositionHistory`.
- * @returns {CompositionHistory}
+ * Creates a default-valued `HistoryEntry`.
+ * @returns {HistoryEntry}
  */
-export function createCompositionHistory() {
+export function createHistoryEntry() {
   return {
     c: "",
     k: [],
@@ -29,25 +29,25 @@ export function createCompositionHistory() {
 
 /**
  * Appends `key` to the `composerKeys`. Has no effect if already full.
- * @param {CompositionHistory} ch
+ * @param {HistoryEntry} he
  * @param {number} maxKeyTime If non-zero, key time longer than this emits an error.
  * @returns {string|null} Returns `null` on validation success.
  */
-export function validate(ch, maxKeyTime) {
+export function validate(he, maxKeyTime) {
   const errorInvalidC = "invalid c";
   const errorInvalidK = "invalid k";
   const errorInvalidE = "invalid e";
-  // TODO: ch.c ch.k mismatch
+  // TODO: h.c h.k mismatch
 
-  if (typeof ch.c !== "string" || ch.c.length > 5) {
+  if (typeof he.c !== "string" || he.c.length > 5) {
     return errorInvalidC;
   }
 
-  if (Array.isArray(ch.k) === false) {
+  if (Array.isArray(he.k) === false) {
     return errorInvalidK;
   }
-  for (let i = 0; i < ch.k.length; i++) {
-    const [key, time] = ch.k[i];
+  for (let i = 0; i < he.k.length; i++) {
+    const [key, time] = he.k[i];
     if (typeof key !== "string" || isKey(key) === false) {
       return errorInvalidK;
     }
@@ -57,7 +57,7 @@ export function validate(ch, maxKeyTime) {
     }
   }
 
-  if (typeof ch.e !== "boolean") {
+  if (typeof he.e !== "boolean") {
     return errorInvalidE;
   }
 
@@ -66,47 +66,47 @@ export function validate(ch, maxKeyTime) {
 
 /**
  * Appends `key` to the `composerKeys`. Has no effect if already full.
- * @param {CompositionHistory} ch
+ * @param {HistoryEntry} he
  * @param {string} key
  * @param {number} sinceLastKey in milliseconds
- * @returns {CompositionHistory|null} Returns `null` on error.
+ * @returns {HistoryEntry|null} Returns `null` on error.
  */
-export function addKey(ch, key, sinceLastKey) {
+export function addKey(he, key, sinceLastKey) {
   if (isKey(key) === false) {
     console.error(`invalid key for addKey ${key}`);
     return null;
   }
-  ch.k.push([key, sinceLastKey]);
-  return ch;
+  he.k.push([key, sinceLastKey]);
+  return he;
 }
 
 /**
  * Checks `k` to see if any key took longer than `idleThreshold`.
- * @param {CompositionHistory} ch
+ * @param {HistoryEntry} he
  * @param {number} idleThreshold in milliseconds
  * @returns {bool}
  */
-export function hasIdle(ch, idleThreshold) {
-  return ch.k.find((item) => item[1] > idleThreshold);
+export function hasIdle(he, idleThreshold) {
+  return he.k.find((item) => item[1] > idleThreshold);
 }
 
 /**
  * Sets `c` to `code`.
- * @param {CompositionHistory} ch
+ * @param {HistoryEntry} he
  * @param {string} code
- * @returns {CompositionHistory}
+ * @returns {HistoryEntry}
  */
-export function setCode(ch, code) {
-  ch.c = code;
-  return ch;
+export function setCode(he, code) {
+  he.c = code;
+  return he;
 }
 
 /**
  * Sets `e` to `true`.
- * @param {CompositionHistory} ch
- * @returns {CompositionHistory}
+ * @param {HistoryEntry} he
+ * @returns {HistoryEntry}
  */
-export function setHasError(ch) {
-  ch.e = true;
-  return ch;
+export function setHasError(he) {
+  he.e = true;
+  return he;
 }

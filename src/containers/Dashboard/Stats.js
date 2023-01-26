@@ -3,14 +3,17 @@ import "./Stats.css";
 import { radicalKeysToRadicals } from "../../lib/typing/key";
 import * as stats from "../../lib/typing/stats.js";
 
+/** @typedef {import('../../lib/typing/stats').Stats} Stats */
+/** @typedef {import('../../hooks/useTypingHistory.js').AllHistory} AllHistory */
+
 /**
- * @param {Object.<string, Object.<string, CompositionHistory>>} history
- * @returns {Object.<string, CompositionHistoryStats>}
+ * @param {AllHistory} allHistory
+ * @returns {Object.<string, Stats>}
  */
-function getDateStats(history) {
-  const dates = Object.keys(history);
+function getDateStats(allHistory) {
+  const dates = Object.keys(allHistory);
   return dates.reduce((acc, date) => {
-    const dateHistory = history[date];
+    const dateHistory = allHistory[date];
     const dateAllCharacterStats = Object.values(dateHistory).map((dateCharacterChs) => {
       const dateCharacterStats = dateCharacterChs.map((dateCharacterCh) =>
         stats.getStats(dateCharacterCh)
@@ -23,17 +26,17 @@ function getDateStats(history) {
 }
 
 /**
- * @param {Object.<string, CompositionHistoryStats>} dateStats
- * @returns {CompositionHistoryStats}
+ * @param {Object.<string, Stats>} dateStats
+ * @returns {Stats}
  */
 function getStatsAllDates(dateStats) {
   return stats.accumulateStats(Object.values(dateStats));
 }
 
 /**
- * @param {Object.<string, CompositionHistoryStats>} dateStats
+ * @param {Object.<string, Stats>} dateStats
  * @param {string} selectedDate
- * @returns {CompositionHistoryStats|null} Returns `null` if either `dateStats` or `selectedDate` is not ready.
+ * @returns {Stats|null} Returns `null` if either `dateStats` or `selectedDate` is not ready.
  */
 function getSelectedStats(dateStats, selectedDate) {
   if (dateStats && selectedDate) {
@@ -42,7 +45,11 @@ function getSelectedStats(dateStats, selectedDate) {
   return null;
 }
 
-function GeneralStatsTable({ chStats }) {
+/**
+ * @param {Object} props
+ * @param {Stats} props.generalStats
+ */
+function GeneralStatsTable({ generalStats }) {
   function Row({ name, help, unit, data }) {
     return (
       <tr>
@@ -55,39 +62,39 @@ function GeneralStatsTable({ chStats }) {
     );
   }
   const rows = [
-    ["總輸入字數", "成功從輸入列中清除的字數", "", chStats.totalComposition],
+    ["總輸入字數", "成功從輸入列中清除的字數", "", generalStats.totalComposition],
     [
       "錯誤輸入字數",
       "成功從輸入列中清除的文字中，有一次以上組字錯誤的字數",
       "",
-      chStats.errorComposition
+      generalStats.errorComposition
     ],
     [
       "輸入正確率",
       "成功從輸入列中清除的文字中，沒有組字錯誤的字數比例",
       "(%)",
-      stats.getCompositionAccuracy(chStats).toFixed(1)
+      stats.getCompositionAccuracy(generalStats).toFixed(1)
     ],
-    ["總輸入時間", "所有按鍵輸入所花的時間", "(秒)", (chStats.totalTime / 1000).toFixed(1)],
+    ["總輸入時間", "所有按鍵輸入所花的時間", "(秒)", (generalStats.totalTime / 1000).toFixed(1)],
     [
-      "有效輸入時間",
-      "扣除使用Backspace清除字母、以及組字錯誤所花費的時間",
+      "無效輸入時間",
+      "使用Backspace清除字母、以及組字錯誤所花費的時間",
       "(秒)",
-      (chStats.effectiveTime / 1000).toFixed(1)
+      ((generalStats.totalTime - generalStats.effectiveTime) / 1000).toFixed(1)
     ],
     [
       "輸入時間效率",
       "總輸入時間中，有效輸入時間的比例",
       "(%)",
-      stats.getTimeEfficiency(chStats).toFixed(1)
+      stats.getTimeEfficiency(generalStats).toFixed(1)
     ],
     [
       "平均最佳速度",
       "(輸入字數 - 錯誤輸入字數) / 有效輸入時間",
       "(字/分)",
-      stats.getOptimalAverageSpeed(chStats).toFixed(1)
+      stats.getOptimalAverageSpeed(generalStats).toFixed(1)
     ],
-    ["平均速度", "輸入字數 / 總輸入時間", "(字/分)", stats.getAverageSpeed(chStats).toFixed(1)]
+    ["平均速度", "總輸入字數 / 總輸入時間", "(字/分)", stats.getAverageSpeed(generalStats).toFixed(1)]
   ].map((v, i) => <Row key={i} name={v[0]} help={v[1]} unit={v[2]} data={v[3]} />);
 
   return (
@@ -97,6 +104,10 @@ function GeneralStatsTable({ chStats }) {
   );
 }
 
+/**
+ * @param {Object} props
+ * @param {Object.<string, number>} props.keysTimes
+ */
 function KeyStatsTable({ keysTimes }) {
   const keysAverageTime = Object.keys(keysTimes).reduce((acc, cur) => {
     const keyTimes = keysTimes[cur];
@@ -130,7 +141,7 @@ function KeyStatsTable({ keysTimes }) {
 
 /**
  * @param {Object} props
- * @param {Object.<string, Object.<string, CompositionHistory>>} props.history
+ * @param {AllHistory} props.history
  */
 export default function Stats({ history }) {
   const [renderedHistory, setRenderedHistory] = useState(history);
@@ -174,7 +185,7 @@ export default function Stats({ history }) {
       {selectedStats ? (
         <>
           <h3>一般</h3>
-          <GeneralStatsTable chStats={selectedStats} />
+          <GeneralStatsTable generalStats={selectedStats} />
           <h3>按鍵</h3>
           <KeyStatsTable keysTimes={selectedStats.keysTimes} />
         </>
