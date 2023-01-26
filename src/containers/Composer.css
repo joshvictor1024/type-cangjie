@@ -1,6 +1,10 @@
 .Composer {
   display: flex;
   flex-direction: row;
+  cursor: pointer;
+}
+.Typing:focus .Composer {
+  cursor: default;
 }
 .Composer__radicals {
   box-sizing: content-box;

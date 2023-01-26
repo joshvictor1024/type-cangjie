@@ -62,16 +62,16 @@ function GeneralStatsTable({ generalStats }) {
     );
   }
   const rows = [
-    ["總輸入字數", "成功從輸入列中清除的字數", "", generalStats.totalComposition],
+    ["總輸入字數", "成功從文字列中清除的字數", "", generalStats.totalComposition],
     [
       "錯誤輸入字數",
-      "成功從輸入列中清除的文字中，有一次以上組字錯誤的字數",
+      "成功從文字列中清除的文字中，輸入過程有一次以上組字錯誤的字數",
       "",
       generalStats.errorComposition
     ],
     [
       "輸入正確率",
-      "成功從輸入列中清除的文字中，沒有組字錯誤的字數比例",
+      "成功從文字列中清除的文字中，輸入過程沒有組字錯誤的字數比例",
       "(%)",
       stats.getCompositionAccuracy(generalStats).toFixed(1)
     ],
@@ -90,7 +90,7 @@ function GeneralStatsTable({ generalStats }) {
     ],
     [
       "平均最佳速度",
-      "(輸入字數 - 錯誤輸入字數) / 有效輸入時間",
+      "(總輸入字數 - 錯誤輸入字數) / 有效輸入時間",
       "(字/分)",
       stats.getOptimalAverageSpeed(generalStats).toFixed(1)
     ],
