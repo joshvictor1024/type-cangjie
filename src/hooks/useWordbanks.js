@@ -5,7 +5,9 @@ import { fetchJSON, fetchText } from "../util/fetch";
 /** @typedef {{name: string, displayName: string, words: string[]}} Wordbank */
 /** @typedef {{name: string, displayName: string, wordbanks: Wordbank[]}} Section */
 
-/** @returns {Wordbank[]} */
+/**
+ * @returns {Wordbank[]}
+ * */
 export default function useWordbanks() {
   /** @type {[Section, React.Dispatch<React.SetStateAction<Section[]>>]} */
   const [sections, setSections] = useState([]);

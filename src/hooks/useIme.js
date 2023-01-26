@@ -2,6 +2,8 @@ import { useState } from "react";
 import { createIme } from "../lib/typing/ime";
 import * as compose from "../lib/typing/compose";
 
+/** @typedef {import('../lib/typing/ime.js').Ime} Ime */
+
 /**
  *
  * @param {Object} props

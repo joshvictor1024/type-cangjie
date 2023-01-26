@@ -6,6 +6,8 @@
 
 import { isRadicalKey } from "./key.js";
 
+/** @typedef {import('./ime.js').Ime} Ime */
+
 /**
  * @typedef {Object} CangjieDicts Entries should be set to null if dictionary is not available.
  * @property {Object.<string, string[]>|null} dict3 dictionary for Cangjie version 3

@@ -2,16 +2,7 @@ import { useRef } from "react";
 import * as ch from "../lib/typing/compositionHistory";
 import * as stats from "../lib/typing/stats.js";
 
-// character history:
-// {
-//   isoDate: String: {
-//     character: String: [{
-//       code: String
-//       keys: [[key: String, time: Number]]
-//       hasError: Boolean
-//     }]
-//   }
-// }
+/** @typedef {import('../lib/typing/ime.js').Ime} Ime */
 
 const MAX_KEY_TIME = 1500;
 

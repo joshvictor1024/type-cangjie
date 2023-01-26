@@ -10,9 +10,7 @@ const DATAPOINT_LENGTH = 60;
 // since interval of `setInterval` fluctuates.
 const DATAPOINT_MAX_AGE = (UPDATE_INTERVAL * 1000) * (DATAPOINT_LENGTH + 2); // ms
 
-/**
- * @typedef {import('../../lib/typing/stats.js').CompositionHistoryStats} CompositionHistoryStats
- */
+/** @typedef {import('../../lib/typing/stats.js').CompositionHistoryStats} CompositionHistoryStats */
 
 /**
  * @param {Object} props

@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import * as wq from "../lib/typing/wordQueue";
 
+/** @typedef {import('./useWordbanks').Wordbank} Wordbank */
+/** @typedef {import('./useWordbanks').Section} Section */
+/** @typedef {import('../lib/typing/ime.js').Ime} Ime */
+
 const WORD_QUEUE_MIN_WORDS = 10;
 const WORD_QUEUE_MAX_WORDS = 15;
 

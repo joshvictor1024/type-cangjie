@@ -14,8 +14,15 @@ import * as ch from "../lib/typing/compositionHistory";
 //   }
 // }
 
+/** @typedef {import('../lib/typing/ime.js').Ime} Ime */
+/** @typedef {import('../lib/typing/compositionHistory.js').CompositionHistory} CompositionHistory */
+
 const MAX_HISTORY_PER_CHARACTER_PER_DAY = 10;
 const MAX_KEY_TIME = 1500;
+
+/**
+ * @param {CompositionHistory[]} obj
+ */
 function validateChs(obj) {
   try {
     let flag = false;
@@ -26,6 +33,10 @@ function validateChs(obj) {
     return false;
   }
 }
+
+/**
+ * @param {Object.<string, CompositionHistory[]>} obj
+ */
 function validateCharactersChs(obj) {
   try {
     let flag = false;
@@ -48,6 +59,10 @@ function validateCharactersChs(obj) {
     return false;
   }
 }
+
+/**
+ * @param {Object.<string, Object.<string, CompositionHistory[]>>} obj
+ */
 function validateDatesHistory(obj) {
   try {
     let flag = false;
@@ -80,7 +95,6 @@ export default function useCompositionHistory() {
   }, []);
 
   /**
-   *
    * @param {string} key [a-z|"Backspace"|"Space"]
    */
   function onKey(key) {
@@ -130,6 +144,9 @@ export default function useCompositionHistory() {
   //   currentCHRef.current = ch.createCompositionHistory();
   // }
 
+  /**
+   * @param {Object.<string, Object.<string, CompositionHistory[]>>} obj
+   */
   function setHistoryExternal(obj) {
     const isValid = validateDatesHistory(obj);
     console.log(obj, isValid);
