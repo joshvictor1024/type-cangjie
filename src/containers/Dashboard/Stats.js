@@ -33,7 +33,7 @@ function getStatsAllDates(dateStats) {
 /**
  * @param {Object.<string, CompositionHistoryStats>} dateStats
  * @param {string} selectedDate
- * @returns {CompositionHistoryStats|null} return `null` if either `dateStats` or `selectedDate` is not ready
+ * @returns {CompositionHistoryStats|null} Returns `null` if either `dateStats` or `selectedDate` is not ready.
  */
 function getSelectedStats(dateStats, selectedDate) {
   if (dateStats && selectedDate) {

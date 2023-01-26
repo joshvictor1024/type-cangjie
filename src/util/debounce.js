@@ -1,5 +1,5 @@
 /**
- * Use setTimeout internally
+ * Uses setTimeout internally.
  * @example
  * const debouncedFunction = debounce(expensiveFunction, 100, {rising: true});
  * debouncedFunction("foo", 42);

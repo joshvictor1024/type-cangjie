@@ -15,10 +15,10 @@ export default function useCangjieDicts() {
       }
 
       const newDicts = {};
-      newDicts.dict3 = { ...cj5Dictonary, ...cj3Dictonary }; // overwrite former with latter
+      newDicts.dict3 = { ...cj5Dictonary, ...cj3Dictonary }; // Overwrite former with latter.
       newDicts.dict5 = { ...cj5Dictonary, ...cj5xDictonary };
       newDicts.dict5x = { ...cj5xDictonary };
-      newDicts.dictMs = { ...cj5Dictonary, ...cj3Dictonary, ...cjmsDictonary }; // overwrite former with latter
+      newDicts.dictMs = { ...cj5Dictonary, ...cj3Dictonary, ...cjmsDictonary }; // Overwrite former with latter.
       setDicts(newDicts);
     })();
   }, []);

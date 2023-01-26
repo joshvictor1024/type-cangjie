@@ -54,3 +54,13 @@ TODO
 - Although some common words are technically incorrect, they are preserved e.g. "姐姐" ("姊" elder sister; "姐" female)
 - For words with multiple meanings (denoted with number 1, 2), only one is preserved.
 - For words with "()", the inclusion and exclusion of the parenthesized characters each counts as a word e.g. 沒(有)用 => 沒有用/沒用 => 沒有用
+
+## Code Style
+
+### Comment
+
+- For function descriptions, use non-imperitive style i.e. third-person singular present tense.
+- For code descriptions, use imperitive style i.e. second-person singular present tense.
+- Use full sentences, beginning with a capital letter and ends with a period.
+  - Inline comments may not follow this.
+- Bracket code with backticks (`).

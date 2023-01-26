@@ -5,8 +5,8 @@ import * as compose from "../lib/typing/compose";
 /**
  *
  * @param {Object} props
- * @param {() => string|null} props.getCompositionTarget return `null` if no target exists
- * @param {((ime: Ime, targetCharacter: string) => {})[]} props.onComposition runs after a `attemptComposition` run without error
+ * @param {() => string|null} props.getCompositionTarget Returns `null` if no target exists.
+ * @param {((ime: Ime, targetCharacter: string) => {})[]} props.onComposition Runs after a `attemptComposition` run without error.
  */
 export default function useIme({ dicts, getCompositionTarget, onComposition }) {
   const [ime, setIme] = useState(createIme());
@@ -16,7 +16,6 @@ export default function useIme({ dicts, getCompositionTarget, onComposition }) {
    * @param {string} key [a-z|"Backspace"|"Space"]
    */
   function enterKey(key) {
-    // chOnKey(key);
     if (key === "Backspace") {
       const newIme = compose.deleteComposerKey(ime);
       setIme({ ...newIme });

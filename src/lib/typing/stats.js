@@ -13,7 +13,7 @@
  */
 
 /**
- * Create a default-valued CompositionHistoryStats
+ * Creates a default-valued `CompositionHistoryStats`.
  * @returns {CompositionHistoryStats}
  */
 export function createCompositionHistoryStats() {
@@ -27,7 +27,7 @@ export function createCompositionHistoryStats() {
 }
 
 /**
- * Extract information from `ch`.
+ * Extracts information from `ch`.
  * @param {CompositionHistory} ch
  * @returns {CompositionHistoryStats}
  */
@@ -79,7 +79,7 @@ export function getStats(ch) {
 }
 
 /**
- * Accumulate one or more `CompositionHistoryStats` into one.
+ * Accumulates one or more `CompositionHistoryStats` into one.
  * @param {CompositionHistoryStats[]} statsArray
  * @returns {CompositionHistoryStats}
  */

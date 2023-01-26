@@ -10,17 +10,17 @@
  */
 
 /**
- * Generate words from wordbanks, and
- * manage the progress of the first word.
+ * Generates words from wordbanks, and
+ * manages the progress of the first word.
  * @typedef {Object} WordQueue
  * @property {Word[]} queue
  * @property {bool[]} firstWordCharactersCorrect
- * whether the first N characters of the first word are composed correctly.
- * length should not exceed first word.
+ * Whether the first N characters of the first word are composed correctly.
+ * Length should not exceed first word.
  */
 
 /**
- * Create a default-valued `WordQueue`
+ * Creates a default-valued `WordQueue`.
  * @returns {WordQueue}
  */
 export function createWordQueue() {
@@ -29,7 +29,7 @@ export function createWordQueue() {
 
 /**
  * @param {WordQueue} wq
- * @returns {string|null} returns `null` on error
+ * @returns {string|null} Returns `null` on error.
  */
 export function getCompositionTarget(wq) {
   if (wq.queue.length === 0) {
@@ -43,7 +43,7 @@ export function getCompositionTarget(wq) {
   if (wq.firstWordCharactersCorrect.length === 0) {
     return firstWord[0];
   }
-  // If last recorded character is correct, target is the next character.
+  // If the last recorded character is correct, target is the next character.
   if (wq.firstWordCharactersCorrect[wq.firstWordCharactersCorrect.length - 1]) {
     // All characters are correct. There is no next character in this word.
     if (wq.firstWordCharactersCorrect.length >= wq.queue.length) {
@@ -51,7 +51,7 @@ export function getCompositionTarget(wq) {
     }
     return firstWord[wq.firstWordCharactersCorrect.length];
   }
-  // If last recorded character is wrong, target is this character.
+  // If the last recorded character is wrong, target is this character.
   return firstWord[wq.firstWordCharactersCorrect.length - 1];
 }
 
@@ -91,7 +91,7 @@ function isFirstWordFinished(wq) {
 }
 
 /**
- * Push `words` to `wq.queue`.
+ * Pushes `words` to `wq.queue`.
  * @param {WordQueue} wq
  * @param {Word[]} words
  * @returns {WordQueue}
@@ -102,7 +102,7 @@ export function pushWords(wq, words) {
 }
 
 /**
- * Set `wq.queue` to `words` and resets `wq.firstWordCharactersCorrect`.
+ * Sets `wq.queue` to `words` and resets `wq.firstWordCharactersCorrect`.
  * @param {WordQueue} wq
  * @param {Word[]} words
  * @returns {WordQueue}

@@ -19,7 +19,6 @@ const MAX_KEY_TIME = 1500;
 function validateChs(obj) {
   try {
     let flag = false;
-    // obj.forEach((v) => (flag |= !validateCharacterHistory(v)));
     obj.forEach((v) => (flag |= ch.validate(v, MAX_KEY_TIME) !== null));
     return !flag;
   } catch (e) {

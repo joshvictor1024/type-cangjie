@@ -6,8 +6,8 @@ import "./Graph.css";
 const RECENT_STATS_PERIOD = 5000; // ms
 const UPDATE_INTERVAL = 1; // s
 const DATAPOINT_LENGTH = 60;
-// Add slack then trim to `DATAPOINT_LENGTH` to keep length of `datapoints` consistent,
-// since interval of `setInterval` fluctuates
+// Adds slack then trim to `DATAPOINT_LENGTH` to keep length of `datapoints` consistent,
+// since interval of `setInterval` fluctuates.
 const DATAPOINT_MAX_AGE = (UPDATE_INTERVAL * 1000) * (DATAPOINT_LENGTH + 2); // ms
 
 /**
@@ -25,12 +25,12 @@ export default function Graph({getRecentStats}) {
     const i = setInterval(() => {
       const recentStats = getRecentStats(RECENT_STATS_PERIOD);
       setDatapoints((c) => {
-        // replace NaN with 0
+        // Replace `NaN` with `0`.
         const averageCpm = stats.getAverageSpeed(recentStats) || 0;
         const optimalAverageCpm = stats.getOptimalAverageSpeed(recentStats) || 0;
-        // delete datapoints older than DATAPOINT_MAX_AGE
+        // Delete datapoints older than `DATAPOINT_MAX_AGE`.
         const removeOld = c.filter((v) => Date.now() - v.timestamp < DATAPOINT_MAX_AGE);
-        // Trim to length, and append new datapoint
+        // Trim to length, and append new datapoint.
         const newC = removeOld.slice(-(DATAPOINT_LENGTH - 1)).concat({cpm: averageCpm, optimalCpm: optimalAverageCpm, timestamp: Date.now()});
         return newC;
       });
@@ -47,7 +47,7 @@ export default function Graph({getRecentStats}) {
       return;
     }
 
-    // Set up SVG coordinates
+    // Set up SVG coordinates.
 
     const width = svgRef.current.clientWidth ?? 0;
     const height = (svgRef.current.clientHeight - toggleSvgUpdateButtonRef.current.clientHeight) ?? 0;
@@ -57,7 +57,7 @@ export default function Graph({getRecentStats}) {
 
     const svg = d3.select(svgRef.current);
 
-    // Set up domain (data) and range (coordinates)
+    // Set up domain (data) and range (coordinates).
 
     const xValue = (v) => v.timestamp;
     const yValue = (v) => v.cpm;
@@ -69,12 +69,12 @@ export default function Graph({getRecentStats}) {
       .domain([0, d3.max(datapoints, yOptValue)+10])
       .range([innerHeight, 0]);
 
-    // Draw
+    // Replace with new `g` to draw in.
 
     svg.select("g").remove();
     const g = svg.append("g");
 
-    // Area
+    // Draw area graph.
 
     const areaGenerator = d3.area()
       .x((v) => xScale(xValue(v)))
@@ -95,15 +95,15 @@ export default function Graph({getRecentStats}) {
       .attr("class", "Area")
       .attr("d", areaGenerator(datapoints));
 
-    // Axes
+    // Draw axes.
 
     const xAxis = d3.axisBottom(xScale)
       .tickFormat((x) => d3.timeFormat("%S")(x)) // seconds
       .tickSizeInner(-innerHeight) // gridlines
-      .tickSizeOuter(0); // remove ending line
+      .tickSizeOuter(0); // Remove ending line.
     const yAxis = d3.axisLeft(yScale)
       .tickSizeInner(-innerWidth) // gridlines
-      .tickSizeOuter(0); // remove ending line
+      .tickSizeOuter(0); // Remove ending line.
     const gXAxis = g.append("g")
       .attr("class", "XAxis")
       .attr("transform", `translate(${margin.left}, ${innerHeight + margin.top})`)
@@ -121,7 +121,7 @@ export default function Graph({getRecentStats}) {
       .attr("transform", `translate(${margin.left / 2}, ${innerHeight + margin.bottom / 2})`)
       .text("速度 (字/分)");
 
-    // Legends
+    // Draw Legends.
 
     const gLegends = g.append("g")
       .attr("transform", `translate(${margin.left + 12}, ${margin.top + 12})`);

@@ -16,7 +16,7 @@ import { isKey } from "./key.js";
  */
 
 /**
- * Create a default-valued CompositionHistory
+ * Creates a default-valued `CompositionHistory`.
  * @returns {CompositionHistory}
  */
 export function createCompositionHistory() {
@@ -28,10 +28,10 @@ export function createCompositionHistory() {
 }
 
 /**
- * Append `key` to the `composerKeys`. Has no effect if already full.
+ * Appends `key` to the `composerKeys`. Has no effect if already full.
  * @param {CompositionHistory} ch
- * @param {number} maxKeyTime if non-zero, key time longer than this emits an error
- * @returns {string|null} returns `null` on validation success
+ * @param {number} maxKeyTime If non-zero, key time longer than this emits an error.
+ * @returns {string|null} Returns `null` on validation success.
  */
 export function validate(ch, maxKeyTime) {
   const errorInvalidC = "invalid c";
@@ -65,11 +65,11 @@ export function validate(ch, maxKeyTime) {
 }
 
 /**
- * Append `key` to the `composerKeys`. Has no effect if already full.
+ * Appends `key` to the `composerKeys`. Has no effect if already full.
  * @param {CompositionHistory} ch
  * @param {string} key
  * @param {number} sinceLastKey in milliseconds
- * @returns {CompositionHistory|null} returns `null` on error
+ * @returns {CompositionHistory|null} Returns `null` on error.
  */
 export function addKey(ch, key, sinceLastKey) {
   if (isKey(key) === false) {
@@ -81,7 +81,7 @@ export function addKey(ch, key, sinceLastKey) {
 }
 
 /**
- * Check `k` to see if any key took longer than `idleThreshold`
+ * Checks `k` to see if any key took longer than `idleThreshold`.
  * @param {CompositionHistory} ch
  * @param {number} idleThreshold in milliseconds
  * @returns {bool}
@@ -91,7 +91,7 @@ export function hasIdle(ch, idleThreshold) {
 }
 
 /**
- * Set `c` to `code`.
+ * Sets `c` to `code`.
  * @param {CompositionHistory} ch
  * @param {string} code
  * @returns {CompositionHistory}
@@ -102,7 +102,7 @@ export function setCode(ch, code) {
 }
 
 /**
- * Set `k` to `true`.
+ * Sets `e` to `true`.
  * @param {CompositionHistory} ch
  * @returns {CompositionHistory}
  */

@@ -52,8 +52,7 @@ export default function useGraph() {
   }
 
   /**
-   * Delete stats `maxAge` ms older than `Date.now()` 
-   * and accumulate the rest
+   * Deletes stats `maxAge` milliseconds older than `Date.now()` and accumulate the rest.
    * @param {number} maxAge
    * @returns 
    */

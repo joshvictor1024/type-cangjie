@@ -26,13 +26,12 @@ function getActiveWordbankList(wordbankActive) {
 /**
  * @param {string[]} activeWordbankNames
  * @param {Wordbank[]} wordbanks
- * @returns {string|null} return `null` if no wordbanks are active
+ * @returns {string|null} Return `null` if no wordbanks are active.
  */
 function getActiveWords(activeWordbankNames, wordbanks) {
   const activeWordbanks = activeWordbankNames
     .map((wordbankName) => wordbanks.find((wb) => wb.name === wordbankName))
     .filter((wb) => wb && wb.words);
-  //console.log(awb);
   if (activeWordbanks.length === 0) return null;
   return activeWordbanks.reduce((acc, cur) => {
     return acc.concat(cur.words);
@@ -40,9 +39,9 @@ function getActiveWords(activeWordbankNames, wordbanks) {
 }
 
 /**
- * @param {number} count draw this number of words, or until `words` run out
- * @param {string[]|null} words this array is modified within the function. pass in a copy if necessary.
- * @returns {string[]|null} if `words` is `null` then `null` is returned
+ * @param {number} count Draws this number of words, or until `words` runs out.
+ * @param {string[]|null} words This array is modified within the function. Pass in a copy if necessary.
+ * @returns {string[]|null} If `words` is `null` then this returns `null`.
  */
 function drawRandom(count, words) {
   if (words === null) {
@@ -80,7 +79,7 @@ export default function usePractice({ sections, wordbankActive, setLookupCharact
     }
   }
 
-  // Make sure wordQueue is re-filled when `activeWordbanks` change.
+  // Make sure `wordQueue` is refilled when `activeWordbanks` changes.
   useEffect(() => {
     if (getActiveWordbankList(wordbankActive).length === 0) return;
     // TODO: add this back in
@@ -97,7 +96,7 @@ export default function usePractice({ sections, wordbankActive, setLookupCharact
     });
   }, [sections, wordbankActive]);
 
-  // Make sure wordQueue is filled above `WORD_QUEUE_MIN_WORDS`.
+  // Make sure `wordQueue` is filled above length `WORD_QUEUE_MIN_WORDS`.
   useEffect(() => {
     if (getActiveWordbankList(wordbankActive).length === 0) return;
     setWordQueue((c) => {

@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import debounce from "../util/debounce";
 
 /**
- * Use setTimeout internally
+ * Uses `setTimeout` internally.
  * @example
  * const debouncedDependency = useDebounceDependency(dependency, 100, {rising: true});
  *
  * useEffect(() => {
- *   // your expensive code
+ *   // Your expensive code goes here.
  *   // ...
  * }, [debouncedDependency]);
  */

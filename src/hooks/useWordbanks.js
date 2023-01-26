@@ -30,7 +30,7 @@ export default function useWordbanks() {
             return;
           }
           const words = wordsString.split(",");
-          // If file is not found, returns HTML document, which contains "<".
+          // If the file is not found, return the HTML document, which contains "<".
           if (words.find((word) => word.includes("<"))) {
             return;
           }

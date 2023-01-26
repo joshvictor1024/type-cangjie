@@ -1,6 +1,6 @@
 /**
  * @param {string} jsonURL
- * @returns {Object|null} return `null` on fetch error
+ * @returns {Object|null} Returns `null` on fetch error.
  */
 export async function fetchJSON(jsonURL) {
   try {
@@ -15,7 +15,7 @@ export async function fetchJSON(jsonURL) {
 
 /**
  * @param {string} textURL
- * @returns {string|null} return `null` on fetch error
+ * @returns {string|null} Returns `null` on fetch error.
  */
 export async function fetchText(textURL) {
   try {
